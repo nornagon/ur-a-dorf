@@ -168,12 +168,11 @@ try {
   while (true) {
     const blockList = await invoke('GetBlockList', {blocksNeeded: 50, minX: 0, minY: 0, minZ: 0, maxX: mapInfo.blockSizeX, maxY: mapInfo.blockSizeY, maxZ: mapInfo.blockSizeZ})
     const mapBlocks = blockList.mapBlocks
-    console.log(mapBlocks.length)
+    for (const block of blockList.mapBlocks) {
+      console.log({x: block.mapX, y: block.mapY, z: block.mapZ})
+    }
     if (mapBlocks.length < 50) break
   }
-    /*
-  const blockList = await invoke('GetBlockList', {minX: 0, minY: 0, minZ: 0, maxX: 10, maxY: 10, maxZ: 10})
-  */
 
 } finally {
   writeMessage(-4, Buffer.alloc(0))
