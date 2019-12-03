@@ -1,41 +1,9 @@
 const net = require('net')
 const util = require('util')
 const debug = require('debug')('dfhack-rpc')
+const promiseStream = require('promise-stream-reader')
 
 const protobuf = require('protobufjs')
-
-function readableOrError(stream) {
-  return new Promise((resolve, reject) => {
-    function readable() {
-      stream.off('readable', readable)
-      stream.off('error', error)
-      resolve()
-    }
-    function error(e) {
-      stream.off('readable', readable)
-      stream.off('error', error)
-      reject(e)
-    }
-    stream.on('readable', readable)
-    stream.on('error', error)
-  })
-}
-
-async function readFromStream(stream, size) {
-  const buf = Buffer.alloc(size)
-  let readBytes = 0
-  while (readBytes < size) {
-    while (true) {
-      const chunk = stream.read(size - readBytes)
-      if (!chunk) break
-      chunk.copy(buf, readBytes)
-      readBytes += chunk.length
-      if (readBytes === size) return buf
-      if (readBytes > size) throw new Error('unreachable')
-    }
-    await readableOrError(stream)
-  }
-}
 
 function qualifiedName(type) {
   let name = type.name
@@ -65,7 +33,10 @@ const s = net.createConnection({
   s.write(header)
 })
 
-const response = await readFromStream(s, 12)
+const reader = promiseStream()
+s.pipe(reader)
+
+const response = await reader.read(12)
 
 function writeMessage(id, buf) {
   const header = Buffer.alloc(8)
@@ -82,7 +53,7 @@ function writeMessage(id, buf) {
 
 async function readMessage() {
   while (true) {
-    const header = await readFromStream(s, 8)
+    const header = await reader.read(8)
     debug('read header:', header)
     const id = header.readInt16LE(0)
     // NB. dfhack struct isn't packed.
@@ -91,7 +62,7 @@ async function readMessage() {
     if (id === -2 /* RPC_REPLY_FAIL */) {
       throw new Error(`failed: ${size}`)
     }
-    const body = size > 0 ? await readFromStream(s, size) : Buffer.alloc(0)
+    const body = size > 0 ? await reader.read(size) : Buffer.alloc(0)
     debug('read body:', body)
     if (id === -1 /* RPC_REPLY_RESULT */) {
       return body
@@ -125,6 +96,7 @@ const methods = {
   ListEnums: {in: dfproto.EmptyMessage, out: dfproto.ListEnumsOut},
   ListUnits: {in: dfproto.ListUnitsIn, out: dfproto.ListUnitsOut},
   GetBlockList: {plugin: 'RemoteFortressReader', in: RemoteFortressReader.BlockRequest, out: RemoteFortressReader.BlockList},
+  ResetMapHashes: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: dfproto.EmptyMessage},
 }
 
 const idTable = {}
@@ -154,6 +126,7 @@ try {
   //console.log(await invoke('GetWorldInfo'))
   //console.log(await invoke('ListEnums'))
   //console.log((await invoke('ListUnits', {scanAll: true, mask: { labors: true }})).value)
+  await invoke('ResetMapHashes')
   console.log(util.inspect(await invoke('GetBlockList', {minX: 0, minY: 0, minZ: 0, maxX: 10, maxY: 10, maxZ: 10}), {depth:5}))
 
 } finally {
