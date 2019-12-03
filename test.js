@@ -1,9 +1,44 @@
 const net = require('net')
 const util = require('util')
 const debug = require('debug')('dfhack-rpc')
-const promiseStream = require('promise-stream-reader')
 
 const protobuf = require('protobufjs')
+
+const makeReader = (s) => {
+  let pending = Buffer.alloc(0)
+  s.on('data', chunk => {
+    debug(`read socket: length=${chunk.length}`)
+    pending = Buffer.concat([pending, chunk])
+  })
+  return {
+    read: (size) => {
+      return new Promise((resolve, reject) => {
+        if (pending.length >= size) {
+          const ret = pending.slice(0, size)
+          pending = Buffer.from(pending.slice(size))
+          resolve(ret)
+          return
+        }
+        function ondata() {
+          if (pending.length >= size) {
+            const ret = pending.slice(0, size)
+            pending = Buffer.from(pending.slice(size))
+            s.off('data', ondata)
+            s.off('error', onerror)
+            resolve(ret)
+          }
+        }
+        function onerror(err) {
+          s.off('data', ondata)
+          s.off('error', onerror)
+          reject(err)
+        }
+        s.on('data', ondata)
+        s.on('error', onerror)
+      })
+    }
+  }
+}
 
 function qualifiedName(type) {
   let name = type.name
@@ -33,8 +68,7 @@ const s = net.createConnection({
   s.write(header)
 })
 
-const reader = promiseStream()
-s.pipe(reader)
+const reader = makeReader(s)
 
 const response = await reader.read(12)
 
@@ -95,6 +129,8 @@ const methods = {
   GetWorldInfo: {in: dfproto.EmptyMessage, out: dfproto.GetWorldInfoOut},
   ListEnums: {in: dfproto.EmptyMessage, out: dfproto.ListEnumsOut},
   ListUnits: {in: dfproto.ListUnitsIn, out: dfproto.ListUnitsOut},
+
+  GetMapInfo: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: RemoteFortressReader.MapInfo},
   GetBlockList: {plugin: 'RemoteFortressReader', in: RemoteFortressReader.BlockRequest, out: RemoteFortressReader.BlockList},
   ResetMapHashes: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: dfproto.EmptyMessage},
 }
@@ -127,7 +163,17 @@ try {
   //console.log(await invoke('ListEnums'))
   //console.log((await invoke('ListUnits', {scanAll: true, mask: { labors: true }})).value)
   await invoke('ResetMapHashes')
-  console.log(util.inspect(await invoke('GetBlockList', {minX: 0, minY: 0, minZ: 0, maxX: 10, maxY: 10, maxZ: 10}), {depth:5}))
+  const mapInfo = await invoke('GetMapInfo')
+  console.log(mapInfo)
+  while (true) {
+    const blockList = await invoke('GetBlockList', {blocksNeeded: 50, minX: 0, minY: 0, minZ: 0, maxX: mapInfo.blockSizeX, maxY: mapInfo.blockSizeY, maxZ: mapInfo.blockSizeZ})
+    const mapBlocks = blockList.mapBlocks
+    console.log(mapBlocks.length)
+    if (mapBlocks.length < 50) break
+  }
+    /*
+  const blockList = await invoke('GetBlockList', {minX: 0, minY: 0, minZ: 0, maxX: 10, maxY: 10, maxZ: 10})
+  */
 
 } finally {
   writeMessage(-4, Buffer.alloc(0))

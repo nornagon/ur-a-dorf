@@ -2,7 +2,6 @@
   "dependencies": {
     "debug": "^4.1.1",
     "google-protobuf": "^3.11.0",
-    "promise-stream-reader": "^1.0.1",
     "protobufjs": "^6.8.8"
   }
 }
