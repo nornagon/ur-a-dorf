@@ -48,8 +48,11 @@ function qualifiedName(type) {
 
 ;(async () => {
 
-const {dfproto} = (await protobuf.load([
-  'CoreProtocol.proto'
+const {dfproto, RemoteFortressReader} = (await protobuf.load([
+  'proto/CoreProtocol.proto',
+  'proto/Basic.proto',
+  'proto/BasicApi.proto',
+  'proto/RemoteFortressReader.proto',
 ])).nested
 
 const s = net.createConnection({
@@ -118,6 +121,10 @@ async function bindMethod({method, inputMsg, outputMsg, plugin}) {
 const methods = {
   GetVersion: {in: dfproto.EmptyMessage, out: dfproto.StringMessage},
   GetDFVersion: {in: dfproto.EmptyMessage, out: dfproto.StringMessage},
+  GetWorldInfo: {in: dfproto.EmptyMessage, out: dfproto.GetWorldInfoOut},
+  ListEnums: {in: dfproto.EmptyMessage, out: dfproto.ListEnumsOut},
+  ListUnits: {in: dfproto.ListUnitsIn, out: dfproto.ListUnitsOut},
+  GetBlockList: {plugin: 'RemoteFortressReader', in: RemoteFortressReader.BlockRequest, out: RemoteFortressReader.BlockList},
 }
 
 const idTable = {}
@@ -125,23 +132,34 @@ async function invoke(method, params) {
   if (!(method in methods)) {
     throw new Error(`unknown method: '${method}'`)
   }
-  const {in: inType, out: outType} = methods[method]
+  const {in: inType, out: outType, plugin} = methods[method]
 
   if (!(method in idTable)) {
+    debug('binding:', method)
     const inputMsg = qualifiedName(inType)
     const outputMsg = qualifiedName(outType)
-    const id = await bindMethod({method, inputMsg, outputMsg})
+    const id = await bindMethod({method, inputMsg, outputMsg, plugin})
     idTable[method] = id
   }
 
+  debug('invoking:', method)
   const requestPayload = inType.encode(inType.fromObject(params)).finish()
   const responsePayload = await invokeById(idTable[method], requestPayload)
   return outType.decode(responsePayload)
 }
 
-console.log(await invoke('GetVersion'))
-console.log(await invoke('GetDFVersion'))
+try {
+  //console.log(await invoke('GetVersion'))
+  //console.log(await invoke('GetDFVersion'))
+  //console.log(await invoke('GetWorldInfo'))
+  //console.log(await invoke('ListEnums'))
+  //console.log((await invoke('ListUnits', {scanAll: true, mask: { labors: true }})).value)
+  console.log(util.inspect(await invoke('GetBlockList', {minX: 0, minY: 0, minZ: 0, maxX: 10, maxY: 10, maxZ: 10}), {depth:5}))
 
+} finally {
+  writeMessage(-4, Buffer.alloc(0))
+  s.end()
+}
 
 })().then(() => {
   process.exit(0)
