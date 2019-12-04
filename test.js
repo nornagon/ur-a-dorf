@@ -15,11 +15,11 @@ await df.connect()
 const invoke = df._invoke.bind(df)
 
 try {
-  console.log(await invoke('GetVersion'))
-  const worldInfo = await invoke('GetWorldInfo')
+  console.log(await df.GetVersion())
+  const worldInfo = await df.GetWorldInfo()
   const civId = worldInfo.civId
-  const { creatureRaws } = await invoke('GetCreatureRaws') // TODO: could be cached...
-  const enums = await invoke('ListEnums')
+  const { creatureRaws } = await df.GetCreatureRaws() // TODO: could be cached...
+  const enums = await df.ListEnums()
   const laborsByName = {}
   const laborsByValue = {}
   for (const {name, value} of enums.unitLabor) {
@@ -27,7 +27,7 @@ try {
     laborsByValue[value] = name
   }
 
-  const { value: units } = await invoke('ListUnits', {
+  const { value: units } = await df.ListUnits({
     scanAll: true,
     civId,
     race: worldInfo.raceId, // TODO: not all members of the fortress are necessarily dwarves...
@@ -38,7 +38,7 @@ try {
     console.log(`${name} labors: ${u.labors.map(l => laborsByValue[l])}`)
   }
 
-  await invoke('SetUnitLabors', {change: [
+  await df.SetUnitLabors({change: [
     {unitId: units[0].unitId, labor: laborsByName.MINE, value: true}
   ]})
 

@@ -166,4 +166,8 @@ class DFConnection {
   }
 }
 
+for (const k in methods) {
+  DFConnection.prototype[k] = function (arg) { return this._invoke(k, arg) }
+}
+
 module.exports = { DFConnection }
