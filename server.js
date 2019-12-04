@@ -1,11 +1,22 @@
 const express = require('express')
 const { DFConnection } = require('./df')
 
+const webpack = require('webpack')
+const webpackDevMiddleware = require('webpack-dev-middleware')
+const config = require('./webpack.config.js')
+const compiler = webpack(config)
+
+
 const app = express()
+
+app.use(webpackDevMiddleware(compiler, {
+  publicPath: config.output.publicPath,
+}))
 
 const df = new DFConnection()
 
 app.use(express.static('static'))
+app.use(express.static('dist'))
 
 let units = []
 
