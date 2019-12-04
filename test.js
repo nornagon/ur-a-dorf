@@ -129,10 +129,12 @@ const methods = {
   GetWorldInfo: {in: dfproto.EmptyMessage, out: dfproto.GetWorldInfoOut},
   ListEnums: {in: dfproto.EmptyMessage, out: dfproto.ListEnumsOut},
   ListUnits: {in: dfproto.ListUnitsIn, out: dfproto.ListUnitsOut},
+  SetUnitLabors: {in: dfproto.SetUnitLaborsIn, out: dfproto.EmptyMessage},
 
   GetMapInfo: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: RemoteFortressReader.MapInfo},
   GetBlockList: {plugin: 'RemoteFortressReader', in: RemoteFortressReader.BlockRequest, out: RemoteFortressReader.BlockList},
   ResetMapHashes: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: dfproto.EmptyMessage},
+  GetCreatureRaws: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: RemoteFortressReader.CreatureRawList},
 }
 
 const idTable = {}
@@ -157,11 +159,34 @@ async function invoke(method, params) {
 }
 
 try {
-  //console.log(await invoke('GetVersion'))
-  //console.log(await invoke('GetDFVersion'))
-  //console.log(await invoke('GetWorldInfo'))
-  //console.log(await invoke('ListEnums'))
-  //console.log((await invoke('ListUnits', {scanAll: true, mask: { labors: true }})).value)
+  console.log(await invoke('GetVersion'))
+  const worldInfo = await invoke('GetWorldInfo')
+  const civId = worldInfo.civId
+  const { creatureRaws } = await invoke('GetCreatureRaws') // TODO: could be cached...
+  const enums = await invoke('ListEnums')
+  const laborsByName = {}
+  const laborsByValue = {}
+  for (const {name, value} of enums.unitLabor) {
+    laborsByName[name] = value
+    laborsByValue[value] = name
+  }
+
+  const { value: units } = await invoke('ListUnits', {
+    scanAll: true,
+    civId,
+    race: worldInfo.raceId, // TODO: not all members of the fortress are necessarily dwarves...
+    mask: { labors: true, skills: true, profession: true, miscTraits: true }
+  })
+  for (const u of units) {
+    const name = u.name ? `${u.name.firstName} ${u.name.lastName} ("${u.name.englishName}")` : creatureRaws.find(x => x.index === u.race).name[0]
+    console.log(`${name} labors: ${u.labors.map(l => laborsByValue[l])}`)
+  }
+
+  await invoke('SetUnitLabors', {change: [
+    {unitId: units[0].unitId, labor: laborsByName.MINE, value: true}
+  ]})
+
+  /*
   await invoke('ResetMapHashes')
   const mapInfo = await invoke('GetMapInfo')
   console.log(mapInfo)
@@ -173,6 +198,7 @@ try {
     }
     if (mapBlocks.length < 50) break
   }
+  */
 
 } finally {
   writeMessage(-4, Buffer.alloc(0))
