@@ -10,6 +10,10 @@ const {dfproto, RemoteFortressReader} = protobuf.loadSync([
 ]).nested
 
 const methods = {
+  BindMethod: {in: dfproto.CoreBindRequest, out: dfproto.CoreBindReply},
+  RunCommand: {in: dfproto.CoreRunCommandRequest, out: dfproto.EmptyMessage},
+  RunLua: {in: dfproto.CoreRunLuaRequest, out: dfproto.StringListMessage},
+
   GetVersion: {in: dfproto.EmptyMessage, out: dfproto.StringMessage},
   GetDFVersion: {in: dfproto.EmptyMessage, out: dfproto.StringMessage},
   GetWorldInfo: {in: dfproto.EmptyMessage, out: dfproto.GetWorldInfoOut},
@@ -70,7 +74,10 @@ function qualifiedName(type) {
 
 class DFConnection {
   constructor() {
-    this._idTable = {}
+    this._idTable = {
+      BindMethod: 0,
+      RunCommand: 1
+    }
   }
 
   async connect() {
@@ -128,18 +135,6 @@ class DFConnection {
     return await this._readMessage()
   }
 
-  async _bindMethod({method, inputMsg, outputMsg, plugin}) {
-    const obj = {method, inputMsg, outputMsg, plugin}
-    const err = dfproto.CoreBindRequest.verify(obj)
-    if (err)
-      throw new Error(err)
-    const message = dfproto.CoreBindRequest.create(obj)
-    const payload = dfproto.CoreBindRequest.encode(message).finish()
-    const replyPayload = await this._invokeById(0, payload)
-    const reply = dfproto.CoreBindReply.decode(replyPayload)
-    return reply.assignedId
-  }
-
   async _invoke(method, params) {
     if (!(method in methods)) {
       throw new Error(`unknown method: '${method}'`)
@@ -150,8 +145,8 @@ class DFConnection {
       debug('binding:', method)
       const inputMsg = qualifiedName(inType)
       const outputMsg = qualifiedName(outType)
-      const id = await this._bindMethod({method, inputMsg, outputMsg, plugin})
-      this._idTable[method] = id
+      const {assignedId} = await this.BindMethod({method, inputMsg, outputMsg, plugin})
+      this._idTable[method] = assignedId
     }
 
     debug('invoking:', method)
