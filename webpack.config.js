@@ -15,10 +15,14 @@ module.exports = {
       path.join(__dirname, 'dist'),
     ]
   },
-  /*
-  // not yet needed:
   module: {
     rules: [
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: 'babel-loader',
+      },
+      /*
       {
         test: /\.css$/,
         use: [ 'style-loader', 'css-loader' ],
@@ -27,7 +31,7 @@ module.exports = {
         test: /\.png$/,
         use: [ 'file-loader' ],
       },
+      */
     ],
   },
-  */
 }
