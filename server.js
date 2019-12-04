@@ -15,27 +15,38 @@ app.use(webpackDevMiddleware(compiler, {
 
 const df = new DFConnection()
 
+app.use(require('body-parser').json())
+
 app.use(express.static('static'))
 app.use(express.static('dist'))
 
 let units = []
+let enums = null
+let creatureRaws = null
+let worldInfo = null
 
 app.get('/dwarves', (req, res) => {
   res.json(units)
 })
 
+app.get('/static-data', (req, res) => {
+  res.json({enums, worldInfo})
+})
+
+app.post('/set-labor', (req, res) => {
+  df.SetUnitLabors({change: [req.body]})
+    .then(
+      () => res.json({ok: true}),
+      (e) => { res.json({ok: false}); console.error(e) }
+    )
+})
+
 
 df.connect().then(async () => {
   console.log('fetching static data...')
-  const { creatureRaws } = await df.GetCreatureRaws()
-  const worldInfo = await df.GetWorldInfo()
-  const enums = await df.ListEnums()
-  const laborsByName = {}
-  const laborsByValue = {}
-  for (const {name, value} of enums.unitLabor) {
-    laborsByName[name] = value
-    laborsByValue[value] = name
-  }
+  creatureRaws = (await df.GetCreatureRaws()).creatureRaws
+  worldInfo = await df.GetWorldInfo()
+  enums = await df.ListEnums()
 
   app.listen(5050)
   console.log('listening on http://localhost:5050')
