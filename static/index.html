@@ -1,0 +1,6 @@
+<!doctype html>
+<body style='font-family: monospace; white-space: pre-wrap'>
+<script>
+  fetch('/dwarves').then(x => x.json()).then(json => document.body.textContent =
+    JSON.stringify(json, null, 2))
+</script>
