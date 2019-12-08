@@ -15,20 +15,23 @@ const Unit = ({unit}) => {
         <span style={{textTransform: 'capitalize'}}>{unit.name.firstName} {unit.name.lastName}</span>
       </> : null}
     </div>
-    <div className="labors">
-      {worldData.enums.unitLabor.filter(l => l.value >= 0)
-          .map(l => <div key={l.value}><input type="checkbox" checked={unit.labors.includes(l.value)} onChange={(e) => {
-            fetch('/set-labor', {
-              method: 'POST',
-              headers: {'Content-type': 'application/json'},
-              body: JSON.stringify({
-                unitId: unit.unitId,
-                labor: l.value,
-                value: e.currentTarget.checked
+    <details>
+      <summary>Labors</summary>
+      <div className="labors">
+        {worldData.enums.unitLabor.filter(l => l.value >= 0)
+            .map(l => <div key={l.value}><input type="checkbox" checked={unit.labors.includes(l.value)} onChange={(e) => {
+              fetch('/set-labor', {
+                method: 'POST',
+                headers: {'Content-type': 'application/json'},
+                body: JSON.stringify({
+                  unitId: unit.unitId,
+                  labor: l.value,
+                  value: e.currentTarget.checked
+                })
               })
-            })
-          }}/> {l.name}</div>)}
-    </div>
+            }}/> {l.name}</div>)}
+      </div>
+    </details>
   </div>
 }
 
