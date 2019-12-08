@@ -6,7 +6,10 @@
     "body-parser": "^1.19.0",
     "debug": "^4.1.1",
     "express": "^4.17.1",
+    "express-session": "^1.17.0",
     "google-protobuf": "^3.11.0",
+    "passport": "^0.4.0",
+    "passport-twitch-new": "^0.0.1",
     "protobufjs": "^6.8.8",
     "webpack-dev-middleware": "^3.7.2"
   },

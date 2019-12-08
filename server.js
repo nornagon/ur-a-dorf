@@ -1,4 +1,31 @@
 const express = require('express')
+const passport = require('passport')
+const twitchStrategy = require('passport-twitch-new').Strategy;
+
+const {
+  TWITCH_OAUTH_CLIENT_ID,
+  TWITCH_OAUTH_CLIENT_SECRET
+} = process.env
+
+passport.use(new twitchStrategy({
+  clientID: TWITCH_OAUTH_CLIENT_ID || 'aoeu',
+  clientSecret: TWITCH_OAUTH_CLIENT_SECRET || 'aoeu',
+  callbackURL: 'http://localhost:5050/auth/twitch/callback',
+  scope: 'user_read',
+}, (accessToken, refreshToken, profile, done) => {
+  console.log(profile)
+  done(null, profile)
+}))
+
+passport.serializeUser(function(user, done) {
+  done(null, JSON.stringify(user))
+})
+
+passport.deserializeUser(function(user, done) {
+  done(null, JSON.parse(user))
+})
+
+
 const { DFConnection } = require('./df')
 
 const webpack = require('webpack')
@@ -20,6 +47,12 @@ app.use(require('body-parser').json())
 app.use(express.static('static'))
 app.use(express.static('dist'))
 
+app.use(require('express-session')({ secret: 'keyboard cat' }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+
 let units = []
 let enums = null
 let creatureRaws = null
@@ -39,6 +72,11 @@ app.post('/set-labor', (req, res) => {
       () => res.json({ok: true}),
       (e) => { res.json({ok: false}); console.error(e) }
     )
+})
+
+app.get('/auth/twitch', passport.authenticate("twitch"))
+app.get('/auth/twitch/callback', passport.authenticate("twitch", { failureRedirect: '/' }), (req, res) => {
+  res.redirect('/')
 })
 
 
