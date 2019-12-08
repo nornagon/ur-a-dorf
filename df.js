@@ -25,6 +25,7 @@ const methods = {
   GetBlockList: {plugin: 'RemoteFortressReader', in: RemoteFortressReader.BlockRequest, out: RemoteFortressReader.BlockList},
   ResetMapHashes: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: dfproto.EmptyMessage},
   GetCreatureRaws: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: RemoteFortressReader.CreatureRawList},
+  GetUnitList: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: RemoteFortressReader.UnitList},
 }
 
 const makeReader = (s) => {
