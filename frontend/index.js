@@ -15,6 +15,9 @@ const Unit = ({unit}) => {
         <span style={{textTransform: 'capitalize'}}>{unit.name.firstName} {unit.name.lastName}</span>
       </> : null}
     </div>
+    <div className="description">
+      {unit.creature.appearance.description}
+    </div>
     <details>
       <summary>Labors</summary>
       <div className="labors">

@@ -97,6 +97,12 @@ df.connect().then(async () => {
       race: worldInfo.raceId, // TODO: not all members of the fortress are necessarily dwarves...
       mask: { labors: true, skills: true, profession: true, miscTraits: true }
     })
+    const { creatureList } = await df.GetUnitList()
+    for (const creature of creatureList) {
+      const unit = _units.find(u => u.unitId === creature.id)
+      if (unit)
+        unit.creature = creature
+    }
     units = _units
   }, 500)
 })
