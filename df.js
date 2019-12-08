@@ -152,7 +152,7 @@ class DFConnection {
     debug('invoking:', method)
     const requestPayload = inType.encode(inType.fromObject(params)).finish()
     const responsePayload = await this._invokeById(this._idTable[method], requestPayload)
-    return outType.decode(responsePayload)
+    return outType.toObject(outType.decode(responsePayload))
   }
 
   close() {
