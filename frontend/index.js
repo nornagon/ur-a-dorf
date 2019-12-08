@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import ReactDOM from 'react-dom'
+import './style.css'
 
 const WorldDataContext = React.createContext(null)
 
