@@ -1,6 +1,7 @@
 const net = require('net')
 const debug = require('debug')('dfhack-rpc')
 const protobuf = require('protobufjs')
+const queue = require('async/queue')
 
 const {dfproto, RemoteFortressReader} = protobuf.loadSync([
   'proto/CoreProtocol.proto',
@@ -82,6 +83,9 @@ class DFConnection {
       BindMethod: 0,
       RunCommand: 1
     }
+    this._queue = queue(async (task) => {
+      return await task
+    })
   }
 
   async connect() {
@@ -114,25 +118,27 @@ class DFConnection {
   }
 
   async _readMessage() {
-    const reader = this._reader
-    while (true) {
-      const header = await reader.read(8)
-      debug('read header:', header)
-      const id = header.readInt16LE(0)
-      // NB. dfhack message header struct isn't packed.
-      const size = header.readInt32LE(4)
-      debug(`           : id=${id} size=${size}`)
-      if (id === -2 /* RPC_REPLY_FAIL */) {
-        throw new Error(`failed: ${size}`)
+    return await this._queue.push((async () => {
+      const reader = this._reader
+      while (true) {
+        const header = await reader.read(8)
+        debug('read header:', header)
+        const id = header.readInt16LE(0)
+        // NB. dfhack message header struct isn't packed.
+        const size = header.readInt32LE(4)
+        debug(`           : id=${id} size=${size}`)
+        if (id === -2 /* RPC_REPLY_FAIL */) {
+          throw new Error(`failed: ${size}`)
+        }
+        const body = size > 0 ? await reader.read(size) : Buffer.alloc(0)
+        debug('read body:', body)
+        if (id === -1 /* RPC_REPLY_RESULT */) {
+          return body
+        } else if (id === -3 /* RPC_REPLY_TEXT */) {
+          debug('reply text:', body.toString())
+        }
       }
-      const body = size > 0 ? await reader.read(size) : Buffer.alloc(0)
-      debug('read body:', body)
-      if (id === -1 /* RPC_REPLY_RESULT */) {
-        return body
-      } else if (id === -3 /* RPC_REPLY_TEXT */) {
-        debug('reply text:', body.toString())
-      }
-    }
+    })())
   }
   async _invokeById(id, body) {
     this._writeMessage(id, body)
