@@ -7,6 +7,7 @@ const {dfproto, RemoteFortressReader} = protobuf.loadSync([
   'proto/Basic.proto',
   'proto/BasicApi.proto',
   'proto/RemoteFortressReader.proto',
+  'proto/rename.proto',
 ]).nested
 
 const methods = {
@@ -26,6 +27,8 @@ const methods = {
   ResetMapHashes: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: dfproto.EmptyMessage},
   GetCreatureRaws: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: RemoteFortressReader.CreatureRawList},
   GetUnitList: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: RemoteFortressReader.UnitList},
+
+  RenameUnit: {plugin: 'rename', in: dfproto.RenameUnitIn, out: dfproto.EmptyMessage},
 }
 
 const makeReader = (s) => {
