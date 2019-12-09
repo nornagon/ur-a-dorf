@@ -7,6 +7,69 @@ const WorldDataContext = React.createContext(null)
 const Json = ({data}) =>
   <div style={{whiteSpace: 'pre-wrap', fontFamily: 'monospace'}}>{JSON.stringify(data, null, 2)}</div>
 
+const df_color = {
+  black: 0,
+  blue: 1,
+  green: 2,
+  cyan: 3,
+  red: 4,
+  magenta: 5,
+  brown: 6,
+  lgray: 7,
+  dgray: 8,
+  lblue: 9,
+  lgreen: 10,
+  lcyan: 11,
+  lred: 12,
+  lmagenta: 13,
+  yellow: 14,
+  white: 15,
+}
+const df_color_to_css = {
+  '0:0:0': { color: 'lightgray' },
+  '0:0:1': { color: 'lightgray' }, // ?
+  '1:0:0': { color: 'navy' },
+  '1:0:1': { color: 'blue' },
+  '2:0:0': { color: 'green' },
+  '2:0:1': { color: 'lightgreen' },
+  '3:0:0': { color: 'teal' },
+  '3:0:1': { color: 'cyan' },
+  '4:0:0': { color: 'maroon' },
+  '4:0:1': { color: 'red' },
+  '5:0:0': { color: 'purple' },
+  '5:0:1': { color: 'fuchsia' },
+  '6:0:0': { color: 'olive' },
+  '6:0:1': { color: 'yellow' },
+  '7:0:0': { color: 'gray' },
+  '7:0:1': { color: 'black' },
+}
+
+const DFText = ({text}) => {
+  const re = /\[(P|B|C:(\d:\d:\d))\]/g
+  let out = []
+  let idx = 0
+  let lastColor = { color: 'black' }
+  let m
+  while (m = re.exec(text)) {
+    out.push(<span style={lastColor} key={out.length}>{text.slice(idx, m.index)}</span>)
+    idx = m.index + m[0].length
+    switch (m[1][0]) {
+      case 'P':
+        out.push(<br key={out.length}/>)
+        break;
+      case 'B':
+        out.push(<br key={out.length}/>)
+        out.push(<br key={out.length}/>)
+        break;
+      case 'C':
+        lastColor = df_color_to_css[m[2]] || { color: 'black' }
+        break;
+    }
+  }
+  out.push(<span key={out.length} style={{color: lastColor}}>{text.slice(idx)}</span>)
+  return out
+}
+
 const Unit = ({unit}) => {
   const worldData = useContext(WorldDataContext)
   return <div className="unit">
@@ -16,7 +79,7 @@ const Unit = ({unit}) => {
       </> : null}
     </div>
     <div className="description">
-      {unit.creature.appearance.description || <em>(no description)</em>}
+      {<DFText text={unit.creature.appearance.description} /> || <em>(no description)</em>}
     </div>
     <details>
       <summary>Labors</summary>
