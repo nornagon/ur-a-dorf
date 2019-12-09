@@ -44,6 +44,8 @@ const makeReader = (s) => {
         if (pending.length >= size) {
           const ret = pending.slice(0, size)
           pending = size === 0 ? Buffer.alloc(0) : pending.slice(size)
+          s.off('data', ondata)
+          s.off('error', onerror)
           resolve(ret)
           return
         }
