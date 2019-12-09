@@ -38,29 +38,56 @@ const Unit = ({unit}) => {
   </div>
 }
 
+const ClaimButton = () => {
+  const [loading, setLoading] = useState(false)
+  function claimUnit() {
+    setLoading(true)
+    fetch('/claim-unit', { method: 'POST' })
+      .then(res => {
+        if (!res.ok) {
+        }
+      })
+      .catch(() => {
+        setLoading(false)
+      })
+  }
+  return <button disabled={loading} onClick={claimUnit}>Claim a dwarf</button>
+}
+
 const Main = () => {
-  const [dwarves, setDwarves] = useState([])
+  const [myUnit, setMyUnit] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [loggedIn, setLoggedIn] = useState(true)
   const worldData = useContext(WorldDataContext)
   useEffect(() => {
-    let timerId = null
-    let cancelled = false
-    function doFetch() {
-      fetch('/dwarves').then(x => x.json()).then(json => {
-        if (cancelled) return
-        setDwarves(json)
-        setTimeout(doFetch, 1000)
-      })
+    const eventSource = new EventSource('/my-unit')
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      setMyUnit(data)
     }
-    doFetch()
+    eventSource.onerror = (event) => {
+      if (eventSource.readyState === EventSource.CLOSED) {
+        setLoading(false)
+        setLoggedIn(false)
+        // not logged in?
+      }
+    }
+    eventSource.onopen = () => {
+      setLoading(false)
+      setLoggedIn(true)
+    }
     return () => {
-      cancelled = true
-      if (timerId != null)
-        clearTimeout(timerId)
+      eventSource.close()
     }
   }, [])
-  return <div>
-    {dwarves.map(d => <Unit key={d.unitId} unit={d} />)}
-      {/*<Json data={worldData} />*/}
+  if (!loggedIn) {
+    return <div>
+      <a href="/auth/twitch">login with twitch</a>
+    </div>
+  }
+  return loading ? null : <div>
+    {myUnit ? <Unit unit={myUnit} /> : <ClaimButton />}
+    {/*<Json data={worldData} />*/}
   </div>
 }
 

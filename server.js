@@ -48,20 +48,20 @@ app.use(require('body-parser').json())
 app.use(express.static('static'))
 app.use(express.static('dist'))
 
-app.use(require('express-session')({ secret: 'keyboard cat' }));
+app.use(require('express-session')({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.get('/auth/twitch', passport.authenticate("twitch"))
+app.get('/auth/twitch/callback', passport.authenticate("twitch", { failureRedirect: '/' }), (req, res) => {
+  res.redirect('/')
+})
 
 
 let units = []
 let enums = null
 let creatureRaws = null
 let worldInfo = null
-
-app.get('/dwarves', (req, res) => {
-  res.json(units)
-})
 
 app.get('/static-data', (req, res) => {
   res.json({enums, worldInfo})
@@ -75,11 +75,6 @@ app.post('/set-labor', (req, res) => {
     )
 })
 
-app.get('/auth/twitch', passport.authenticate("twitch"))
-app.get('/auth/twitch/callback', passport.authenticate("twitch", { failureRedirect: '/' }), (req, res) => {
-  res.redirect('/')
-})
-
 async function claimUnit(userId, unitId, nickname) {
   await store.createClaim(userId, unitId)
   await df.RenameUnit({ unitId, nickname })
@@ -90,14 +85,23 @@ async function getAvailableUnits() {
   for (const c of claims) { claimedUnits.add(c.unitId) }
   return units.filter(u => !claimedUnits.has(u.unitId))
 }
+async function getClaimedUnit(userId) {
+  const existingClaims = await store.getClaims(userId)
+  for (const claim of existingClaims) {
+    for (const unit of units) {
+      if (unit.unitId === claim.unitId) {
+        return unit
+      }
+    }
+  }
+  return null
+}
 
 app.post('/claim-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
   (async () => {
-    const existingClaims = await store.getClaims(req.user.id)
-    for (const claim of existingClaims) {
-      if (units.some(u => u.unitId === claim.unitId)) { // the unit is alive
-        return res.json({ok: false, reason: 'You may only claim 1 unit at a time.'})
-      }
+    const existingClaimedUnit = await getClaimedUnit(req.user.id)
+    if (existingClaimedUnit) {
+      return res.json({ok: false, reason: 'You may only claim 1 unit at a time.'})
     }
     const available = await getAvailableUnits()
     if (available.length > 0) {
@@ -106,6 +110,32 @@ app.post('/claim-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
       res.json({ok: true, claimed: claimed.unitId})
     }
   })().catch(next)
+})
+
+app.get('/my-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
+  res.writeHead(200, {'Content-Type': 'text/event-stream', 'Connection': 'keep-alive', 'Cache-Control': 'no-cache'})
+  res.write('\n\n')
+  let timeout = null
+  req.on('close', () => {
+    if (timeout != null)
+      clearTimeout(timeout)
+  })
+
+  async function check() {
+    console.log('check')
+    try {
+      const claimedUnit = await getClaimedUnit(req.user.id)
+      if (claimedUnit) {
+        res.write(`data: ${JSON.stringify(claimedUnit)}\n\n`)
+      }
+    } catch (e) {
+      console.error(e.stack)
+      res.end()
+      return
+    }
+    timeout = setTimeout(check, 1000)
+  }
+  check()
 })
 
 
