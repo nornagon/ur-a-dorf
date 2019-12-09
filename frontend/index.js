@@ -12,11 +12,11 @@ const Unit = ({unit}) => {
   return <div className="unit">
     <div className="name">
       {unit.name ? <>
-        <span style={{textTransform: 'capitalize'}}>{unit.name.firstName} {unit.name.lastName}</span>
+        <span style={{textTransform: 'capitalize'}}>{unit.name.firstName}</span>{unit.name.nickname ? ` '${unit.name.nickname}'` : ''} {unit.name.lastName}
       </> : null}
     </div>
     <div className="description">
-      {unit.creature.appearance.description}
+      {unit.creature.appearance.description || <em>(no description)</em>}
     </div>
     <details>
       <summary>Labors</summary>
