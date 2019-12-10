@@ -71,7 +71,7 @@ let itemTypes = null
 let worldInfo = null
 
 app.get('/static-data', (req, res) => {
-  res.json({enums, worldInfo, itemTypes})
+  res.json({enums})
 })
 
 app.post('/set-labor', (req, res) => {
