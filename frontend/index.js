@@ -30,7 +30,7 @@ const df_color_to_css = {
   '0:0:0': { color: 'lightgray' },
   '0:0:1': { color: 'lightgray' }, // ?
   '1:0:0': { color: 'navy' },
-  '1:0:1': { color: 'blue' },
+  '1:0:1': { color: '#4b4bff' /* blue */ },
   '2:0:0': { color: 'green' },
   '2:0:1': { color: 'lightgreen' },
   '3:0:0': { color: 'teal' },
@@ -40,9 +40,9 @@ const df_color_to_css = {
   '5:0:0': { color: 'purple' },
   '5:0:1': { color: 'fuchsia' },
   '6:0:0': { color: 'olive' },
-  '6:0:1': { color: 'yellow' },
+  '6:0:1': { color: '#f9e747' /* yellow */ },
   '7:0:0': { color: 'gray' },
-  '7:0:1': { color: 'black' },
+  '7:0:1': { color: 'white' },
 }
 
 const DFText = ({text}) => {
@@ -52,7 +52,8 @@ const DFText = ({text}) => {
   let lastColor = { color: 'black' }
   let m
   while (m = re.exec(text)) {
-    out.push(<span style={lastColor} key={out.length}>{text.slice(idx, m.index)}</span>)
+    const snippet = text.slice(idx, m.index)
+    if (snippet.length) out.push(<span style={lastColor} key={out.length}>{snippet}</span>)
     idx = m.index + m[0].length
     switch (m[1][0]) {
       case 'P':
