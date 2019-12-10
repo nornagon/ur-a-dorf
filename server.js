@@ -6,13 +6,14 @@ const { ensureLoggedIn } = require('connect-ensure-login')
 
 const {
   TWITCH_OAUTH_CLIENT_ID,
-  TWITCH_OAUTH_CLIENT_SECRET
+  TWITCH_OAUTH_CLIENT_SECRET,
+  PUBLIC_URL = 'http://localhost:5050',
 } = process.env
 
 passport.use(new twitchStrategy({
   clientID: TWITCH_OAUTH_CLIENT_ID || 'aoeu',
   clientSecret: TWITCH_OAUTH_CLIENT_SECRET || 'aoeu',
-  callbackURL: 'http://localhost:5050/auth/twitch/callback',
+  callbackURL: `${PUBLIC_URL}/auth/twitch/callback`,
   scope: 'user_read',
 }, (accessToken, refreshToken, profile, done) => {
   console.log(profile)
@@ -119,7 +120,7 @@ app.post('/claim-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
 })
 
 app.get('/my-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
-  res.writeHead(200, {'Content-Type': 'text/event-stream', 'Connection': 'keep-alive', 'Cache-Control': 'no-cache'})
+  res.writeHead(200, {'Content-Type': 'text/event-stream', 'Connection': 'keep-alive', 'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'})
   res.write('\n\n')
   let timeout = null
   req.on('close', () => {
@@ -160,7 +161,7 @@ df.connect().then(async () => {
   enums = await df.ListEnums()
 
   app.listen(5050)
-  console.log('listening on http://localhost:5050')
+  console.log(`listening on ${PUBLIC_URL}`)
 
   setInterval(async () => {
     const { civId } = worldInfo
