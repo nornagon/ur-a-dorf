@@ -49,7 +49,11 @@ app.use(require('body-parser').json())
 app.use(express.static('static'))
 app.use(express.static('dist'))
 
-app.use(require('express-session')({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
+app.use(require('cookie-session')({
+  name: 'session',
+  keys: ['keyboard cat'],
+  maxAge: 24 * 60 * 60 * 1000,
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
