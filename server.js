@@ -61,10 +61,11 @@ app.get('/auth/twitch/callback', passport.authenticate("twitch", { failureRedire
 let units = []
 let enums = null
 let creatureRaws = null
+let itemTypes = null
 let worldInfo = null
 
 app.get('/static-data', (req, res) => {
-  res.json({enums, worldInfo})
+  res.json({enums, worldInfo, itemTypes})
 })
 
 app.post('/set-labor', (req, res) => {
@@ -122,7 +123,6 @@ app.get('/my-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
   })
 
   async function check() {
-    console.log('check')
     try {
       const claimedUnit = await getClaimedUnit(req.user.id)
       if (claimedUnit) {
@@ -142,6 +142,7 @@ app.get('/my-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
 df.connect().then(async () => {
   console.log('fetching static data...')
   creatureRaws = (await df.GetCreatureRaws()).creatureRaws
+  itemTypes = (await df.GetItemList()).materialList
   worldInfo = await df.GetWorldInfo()
   enums = await df.ListEnums()
 

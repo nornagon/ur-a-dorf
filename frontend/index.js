@@ -70,6 +70,41 @@ const DFText = ({text}) => {
   return out
 }
 
+const wrap = (str, left, right) => {
+  right = right || left
+  if (!right && !left) return str
+  return `${left}${str}${right}`
+}
+
+const qualityMarker = [ '', '-', '+', '*', '≡', '☼' ]
+
+const Item = ({item}) => {
+  const foreign = !!(item.flags1 & (1 << 14))
+  const {quality, isImproved, improvementQuality, description} = item
+  let name = description
+  if (foreign) name = wrap(description, '(', ')')
+  name = wrap(name, qualityMarker[quality])
+  if (isImproved) {
+    name = wrap(name, '«', '»')
+    name = wrap(name, qualityMarker[improvementQuality])
+  }
+  return <span>{name}</span>
+}
+
+const modeName = {
+  0: 'Hauled',
+  1: 'Weapon',
+  2: 'Worn',
+  3: 'Piercing',
+  4: 'Flask',
+  5: 'WrappedAround',
+  6: 'StuckIn',
+  7: 'InMouth',
+  8: 'Pet',
+  9: 'SewnInto',
+  10: 'Strapped',
+}
+
 const Unit = ({unit}) => {
   const worldData = useContext(WorldDataContext)
   return <div className="unit">
@@ -97,6 +132,18 @@ const Unit = ({unit}) => {
               })
             }}/> {l.name}</div>)}
       </div>
+    </details>
+    <details>
+      <summary>Inventory</summary>
+      <ul>
+        {unit.creature.inventory.map(({item, mode}) => {
+          return <li><Item item={item} key={item.id} />, {modeName[mode]}</li>
+        })}
+      </ul>
+    </details>
+    <details>
+      <summary>Raw JSON</summary>
+      <Json data={unit} />
     </details>
   </div>
 }
