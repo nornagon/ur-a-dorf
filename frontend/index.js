@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import ReactDOM from 'react-dom'
 import './style.css'
+import { jobSkillById, laborName } from './enums'
 
 const WorldDataContext = React.createContext(null)
 
@@ -107,11 +108,12 @@ const modeName = {
 
 const Unit = ({unit}) => {
   const worldData = useContext(WorldDataContext)
+  const profession = unit.customProfession || jobSkillById[unit.profession].caption_noun
   return <div className="unit">
     <div className="name">
       {unit.name ? <>
         <span style={{textTransform: 'capitalize'}}>{unit.name.firstName}</span>{unit.name.nickname ? ` '${unit.name.nickname}'` : ''} {unit.name.lastName}
-      </> : null}
+      </> : null}, {profession}
     </div>
     <div className="description">
       {<DFText text={unit.creature.appearance.description} /> || <em>(no description)</em>}
@@ -130,7 +132,7 @@ const Unit = ({unit}) => {
                   value: e.currentTarget.checked
                 })
               })
-            }}/> {l.name}</div>)}
+            }}/> {laborName(l.value)}</div>)}
       </div>
     </details>
     <details>
