@@ -18,3 +18,7 @@ body {
   background: gray;
   text-align: center;
 }
+
+a:link, a:visited {
+  color: cyan;
+}
