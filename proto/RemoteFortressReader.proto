@@ -433,6 +433,19 @@ message InventoryItem
     optional Item item = 2;
 }
 
+message Job
+{
+    optional int32 id = 1;
+    optional int32 type = 2;
+    optional int32 subtype = 3;
+    optional int32 flags = 4;
+    optional MatPair material = 5;
+    optional int32 histfig_id = 7;
+    optional int32 material_category = 8;
+    optional string reaction_name = 9;
+    repeated Item items = 10;
+}
+
 message UnitDefinition
 {
     required int32 id = 1;
@@ -458,6 +471,7 @@ message UnitDefinition
     optional float subpos_x = 21;
     optional float subpos_y = 22;
     optional float subpos_z = 23;
+    optional Job current_job = 24;
 }
 
 message UnitList

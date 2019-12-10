@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import ReactDOM from 'react-dom'
 import './style.css'
-import { jobSkillById, laborName } from './enums'
+import { jobSkillById, jobTypeById, laborName } from './enums'
 
 const WorldDataContext = React.createContext(null)
 
@@ -89,7 +89,15 @@ const Item = ({item}) => {
     name = wrap(name, '«', '»')
     name = wrap(name, qualityMarker[improvementQuality])
   }
-  return <span>{name}</span>
+  return <span>{name}{item.stackSize > 1 ? ` [${item.stackSize}]` : null}</span>
+}
+
+const Job = ({job}) => {
+  if (!job) {
+    return <span>No Job</span>
+  }
+  const jobType = jobTypeById[job.type]
+  return <span>{jobType.caption}</span>
 }
 
 const modeName = {
@@ -115,6 +123,9 @@ const Unit = ({unit}) => {
         <span style={{textTransform: 'capitalize'}}>{unit.name.firstName}</span>{unit.name.nickname ? ` '${unit.name.nickname}'` : ''} {unit.name.lastName}
       </> : null}, {profession}
     </div>
+    <div className="job">
+      <Job job={unit.creature.currentJob} />
+    </div>
     <div className="description">
       {<DFText text={unit.creature.appearance.description} /> || <em>(no description)</em>}
     </div>
@@ -139,7 +150,7 @@ const Unit = ({unit}) => {
       <summary>Inventory</summary>
       <ul>
         {unit.creature.inventory.map(({item, mode}) => {
-          return <li><Item item={item} key={item.id} />, {modeName[mode]}</li>
+          return <li key={item.id}><Item item={item} />, {modeName[mode]}</li>
         })}
       </ul>
     </details>
