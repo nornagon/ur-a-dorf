@@ -128,6 +128,13 @@ const Unit = ({unit}) => {
     <div className="job">
       <Job job={unit.creature.currentJob} />
     </div>
+    <div className="environment">
+      {unit.creature.outside ? <span style={df_color_to_css['3:0:1']}>Outside</span> : <span style={df_color_to_css['6:0:0']}>Inside</span>}
+      {" "}
+      {unit.creature.light ? <span style={df_color_to_css['6:0:1']}>Light</span> : <span style={df_color_to_css['7:0:0']}>Dark</span>}
+      {" "}
+      {unit.creature.light ? <span style={df_color_to_css['2:0:1']}>Above Ground</span> : <span style={df_color_to_css['7:0:0']}>Subterranean</span>}
+    </div>
     <div className="description">
       {<DFText text={unit.creature.appearance.description} /> || <em>(no description)</em>}
     </div>

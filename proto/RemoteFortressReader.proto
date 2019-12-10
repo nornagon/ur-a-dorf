@@ -472,6 +472,10 @@ message UnitDefinition
     optional float subpos_y = 22;
     optional float subpos_z = 23;
     optional Job current_job = 24;
+
+    optional bool light = 25;
+    optional bool subterranean = 26;
+    optional bool outside = 27;
 }
 
 message UnitList
