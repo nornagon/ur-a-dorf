@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import ReactDOM from 'react-dom'
 import './style.css'
 import { jobSkillById, jobTypeById, laborName } from './enums'
+import { applyPatch } from 'rfc6902'
 
 const WorldDataContext = React.createContext(null)
 
@@ -185,9 +186,15 @@ const Main = () => {
   const worldData = useContext(WorldDataContext)
   useEffect(() => {
     const eventSource = new EventSource('/my-unit')
+    let lastData = null
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data)
-      setMyUnit(data)
+      if (data.replace) {
+        lastData = data.replace
+      } else {
+        applyPatch(lastData, data.patch)
+      }
+      setMyUnit({...lastData})
     }
     eventSource.onerror = (event) => {
       if (eventSource.readyState === EventSource.CLOSED) {

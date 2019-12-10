@@ -1,6 +1,7 @@
 const express = require('express')
 const passport = require('passport')
 const twitchStrategy = require('passport-twitch-new').Strategy
+const rfc6902 = require('rfc6902')
 const { ensureLoggedIn } = require('connect-ensure-login')
 
 const {
@@ -122,11 +123,19 @@ app.get('/my-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
       clearTimeout(timeout)
   })
 
+  let lastData = null
   async function check() {
     try {
       const claimedUnit = await getClaimedUnit(req.user.id)
       if (claimedUnit) {
-        res.write(`data: ${JSON.stringify(claimedUnit)}\n\n`)
+        let data
+        if (lastData == null) {
+          data = { replace: claimedUnit }
+        } else {
+          data = { patch: rfc6902.createPatch(lastData, claimedUnit) }
+        }
+        lastData = claimedUnit
+        res.write(`data: ${JSON.stringify(data)}\n\n`)
       }
     } catch (e) {
       console.error(e.stack)
