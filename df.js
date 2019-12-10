@@ -88,7 +88,7 @@ class DFConnection {
       RunCommand: 1
     }
     this._queue = queue(async (task) => {
-      return await task
+      return await task()
     })
   }
 
@@ -122,7 +122,7 @@ class DFConnection {
   }
 
   async _readMessage() {
-    return await this._queue.push((async () => {
+    return await this._queue.push(async () => {
       const reader = this._reader
       while (true) {
         const header = await reader.read(8)
@@ -142,7 +142,7 @@ class DFConnection {
           debug('reply text:', body.toString())
         }
       }
-    })())
+    })
   }
   async _invokeById(id, body) {
     this._writeMessage(id, body)
