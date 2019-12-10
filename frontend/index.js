@@ -191,10 +191,11 @@ const Main = () => {
       const data = JSON.parse(event.data)
       if (data.replace) {
         lastData = data.replace
-      } else {
+        setMyUnit(lastData)
+      } else if (data.patch && data.patch.length) {
         applyPatch(lastData, data.patch)
+        setMyUnit({...lastData}) // spread to force new object
       }
-      setMyUnit({...lastData})
     }
     eventSource.onerror = (event) => {
       if (eventSource.readyState === EventSource.CLOSED) {
