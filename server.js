@@ -78,7 +78,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 if (env === 'development') {
-  app.get('/auth/dummy', passport.authenticate("dummy"))
+  app.get('/auth/dummy', passport.authenticate("dummy"), (req, res) => res.redirect('/'))
 }
 app.get('/auth/twitch', passport.authenticate("twitch"))
 app.get('/auth/twitch/callback', passport.authenticate("twitch", { failureRedirect: '/' }), (req, res) => {
