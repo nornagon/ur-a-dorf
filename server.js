@@ -119,13 +119,27 @@ app.post('/claim-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
   })().catch(next)
 })
 
+const watching = {}
+const watchingEv = new (require('events').EventEmitter)()
+
 app.get('/my-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
+  if (!(req.user.id in watching)) {
+    watching[req.user.id] = {count: 0, user: req.user}
+  }
+  watching[req.user.id].count++
+  watchingEv.emit('changed')
   res.writeHead(200, {'Content-Type': 'text/event-stream', 'Connection': 'keep-alive', 'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'})
   res.write('\n\n')
   let timeout = null
   req.on('close', () => {
     if (timeout != null)
       clearTimeout(timeout)
+    if (req.user.id in watching) {
+      watching[req.user.id].count--;
+      if (watching[req.user.id].count === 0)
+        delete watching[req.user.id]
+    }
+    watchingEv.emit('changed')
   })
 
   let lastData = null
@@ -150,6 +164,19 @@ app.get('/my-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
     timeout = setTimeout(check, 1000)
   }
   check()
+})
+
+app.get('/_watching', (req, res, next) => {
+  res.writeHead(200, {'Content-Type': 'text/event-stream', 'Connection': 'keep-alive', 'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'})
+  res.write('\n\n')
+  function handler() {
+    res.write(`data: ${JSON.stringify(watching)}\n\n`)
+  }
+  watchingEv.on('changed', handler)
+  req.on('close', () => {
+    watchingEv.off('changed', handler)
+  })
+  handler()
 })
 
 

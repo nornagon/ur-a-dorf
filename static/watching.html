@@ -1,0 +1,8 @@
+<!doctype html>
+<body style='font-family: monospace; white-space: pre-wrap'>
+<script>
+  new EventSource('/_watching').onmessage = (e) => {
+    const watching = JSON.parse(e.data)
+    document.body.textContent = JSON.stringify(Object.values(watching).map(w => w.user.display_name), null, 2)
+  }
+</script>
