@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import ReactDOM from 'react-dom'
 import './style.css'
-import { jobSkillById, jobTypeById, laborName } from './enums'
+import { jobSkillById, jobTypeById, laborName, skillLevel } from './enums'
 import { applyPatch } from 'rfc6902'
 
 const WorldDataContext = React.createContext(null)
@@ -138,6 +138,14 @@ const Unit = ({unit}) => {
     <div className="description">
       {<DFText text={unit.creature.appearance.description} /> || <em>(no description)</em>}
     </div>
+    <details>
+      <summary>Skills</summary>
+      <ul className="skills">
+        {unit.skills.map(skill =>
+          <li key={skill.id}>{skillLevel(skill.level)} {jobSkillById[skill.id].caption_noun}</li>
+        )}
+      </ul>
+    </details>
     <details>
       <summary>Labors</summary>
       <div className="labors">

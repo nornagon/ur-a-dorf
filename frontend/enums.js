@@ -1043,6 +1043,43 @@ export function laborName(laborId) {
   }
 }
 
+export function skillLevel(level) {
+  switch(level) {
+  case 0:
+    return "Dabbling";
+  case 1:
+    return "Novice";
+  case 2:
+    return "Adequate";
+  case 3:
+    return "Competent";
+  case 4:
+    return "Skilled";
+  case 5:
+    return "Proficient";
+  case 6:
+    return "Talented";
+  case 7:
+    return "Adept";
+  case 8:
+    return "Expert";
+  case 9:
+    return "Professional";
+  case 10:
+    return "Accomplished";
+  case 0xb:
+    return "Great";
+  case 0xc:
+    return "Master";
+  case 0xd:
+    return "High Master";
+  case 0xe:
+    return "Grand Master";
+  default:
+    return "Legendary";
+  }
+}
+
 export const jobType = {
   'CarveFortification': {
     'caption': "Carve Fortification",
