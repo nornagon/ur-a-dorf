@@ -170,6 +170,7 @@ class DFConnection {
   }
 
   close() {
+    if (this._socket.destroyed) return
     this._writeMessage(-4 /* RPC_REQUEST_QUIT */, Buffer.alloc(0))
     this._socket.end()
   }

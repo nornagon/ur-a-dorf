@@ -1,24 +1,43 @@
 const express = require('express')
 const passport = require('passport')
-const twitchStrategy = require('passport-twitch-new').Strategy
 const rfc6902 = require('rfc6902')
 const { ensureLoggedIn } = require('connect-ensure-login')
 
+const env = process.env.NODE_ENV || 'development'
+
+const twitchStrategy = require('passport-twitch-new').Strategy
 const {
   TWITCH_OAUTH_CLIENT_ID,
   TWITCH_OAUTH_CLIENT_SECRET,
-  PUBLIC_URL = 'http://localhost:5050',
+  PUBLIC_URL = env === 'production' ? 'https://df.nornagon.net' : 'http://localhost:5050',
 } = process.env
 
 passport.use(new twitchStrategy({
-  clientID: TWITCH_OAUTH_CLIENT_ID || 'aoeu',
-  clientSecret: TWITCH_OAUTH_CLIENT_SECRET || 'aoeu',
+  clientID: TWITCH_OAUTH_CLIENT_ID || 'not-set',
+  clientSecret: TWITCH_OAUTH_CLIENT_SECRET || 'not-set',
   callbackURL: `${PUBLIC_URL}/auth/twitch/callback`,
   scope: 'user_read',
 }, (accessToken, refreshToken, profile, done) => {
   console.log(profile)
   done(null, profile)
 }))
+
+if (env === 'development') {
+  const fakeUser = {
+    id: '1234',
+    display_name: 'uristmcviewer',
+  }
+  class DummyStrategy extends passport.Strategy {
+    constructor() {
+      super()
+      this.name = 'dummy'
+    }
+    authenticate(req) {
+      return this.success(fakeUser)
+    }
+  }
+  passport.use(new DummyStrategy())
+}
 
 passport.serializeUser(function(user, done) {
   done(null, JSON.stringify(user))
@@ -33,15 +52,15 @@ const { DFConnection } = require('./df')
 const store = require('./datastore')
 
 const webpack = require('webpack')
-const webpackDevMiddleware = require('webpack-dev-middleware')
 const config = require('./webpack.config.js')
 const compiler = webpack(config)
+const webpackDevMiddleware = require('webpack-dev-middleware')(compiler, {
+  publicPath: config.output.publicPath,
+})
 
 const app = express()
 
-app.use(webpackDevMiddleware(compiler, {
-  publicPath: config.output.publicPath,
-}))
+app.use(webpackDevMiddleware)
 
 const df = new DFConnection()
 
@@ -58,6 +77,9 @@ app.use(require('cookie-session')({
 app.use(passport.initialize());
 app.use(passport.session());
 
+if (env === 'development') {
+  app.get('/auth/dummy', passport.authenticate("dummy"))
+}
 app.get('/auth/twitch', passport.authenticate("twitch"))
 app.get('/auth/twitch/callback', passport.authenticate("twitch", { failureRedirect: '/' }), (req, res) => {
   res.redirect('/')
@@ -188,7 +210,7 @@ df.connect().then(async () => {
   enums = await df.ListEnums()
 
   app.listen(5050)
-  console.log(`listening on ${PUBLIC_URL}`)
+  console.log(`listening on http://localhost:5050`)
 
   setInterval(async () => {
     const { civId } = worldInfo
@@ -206,4 +228,9 @@ df.connect().then(async () => {
     }
     units = _units
   }, 500)
+}).catch(e => {
+  console.error(e)
+  df.close()
+  webpackDevMiddleware.close()
+  process.exit(1)
 })
