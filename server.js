@@ -51,23 +51,26 @@ passport.deserializeUser(function(user, done) {
 const { DFConnection } = require('./df')
 const store = require('./datastore')
 
-const webpack = require('webpack')
-const config = require('./webpack.config.js')
-const compiler = webpack(config)
-const webpackDevMiddleware = require('webpack-dev-middleware')(compiler, {
-  publicPath: config.output.publicPath,
-})
-
 const app = express()
 
-app.use(webpackDevMiddleware)
+app.use(express.static('static'))
+
+if (env === 'development') {
+  const webpack = require('webpack')
+  const config = require('./webpack.config.js')
+  const compiler = webpack(config)
+  const webpackDevMiddleware = require('webpack-dev-middleware')(compiler, {
+    publicPath: config.output.publicPath,
+  })
+
+  app.use(webpackDevMiddleware)
+} else {
+  app.use(express.static('dist'))
+}
 
 const df = new DFConnection()
 
 app.use(require('body-parser').json())
-
-app.use(express.static('static'))
-app.use(express.static('dist'))
 
 app.use(require('cookie-session')({
   name: 'session',
@@ -231,6 +234,5 @@ df.connect().then(async () => {
 }).catch(e => {
   console.error(e)
   df.close()
-  webpackDevMiddleware.close()
   process.exit(1)
 })
