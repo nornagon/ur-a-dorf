@@ -141,7 +141,7 @@ const Unit = ({unit}) => {
     <details>
       <summary>Skills</summary>
       <ul className="skills">
-        {unit.skills.map(skill =>
+        {(unit.skills || []).map(skill =>
           <li key={skill.id}>{skillLevel(skill.level)} {jobSkillById[skill.id].caption_noun}</li>
         )}
       </ul>
@@ -166,7 +166,7 @@ const Unit = ({unit}) => {
     <details>
       <summary>Inventory</summary>
       <ul>
-        {unit.creature.inventory.map(({item, mode}) => {
+        {(unit.creature.inventory || []).map(({item, mode}) => {
           return <li key={item.id}><Item item={item} />, {modeName[mode]}</li>
         })}
       </ul>
