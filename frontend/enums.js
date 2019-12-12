@@ -2381,3 +2381,803 @@ export const jobType = {
 export const jobTypeById = Object.keys(jobType).map(k => jobType[k])
 
 
+export const profession =  {
+  'MINER': {
+    'caption': 'Miner',
+    'color': '7',
+    'moodable': 'true',
+  },
+  'WOODWORKER': {
+    'caption': 'Woodworker',
+    'color': '14',
+    'moodable': 'true',
+  },
+  'CARPENTER': {
+    'caption': 'Carpenter',
+    'parent': 'WOODWORKER',
+    'color': '14',
+    'moodable': 'true',
+  },
+  'BOWYER': {
+    'caption': 'Bowyer',
+    'parent': 'WOODWORKER',
+    'color': '14',
+    'moodable': 'true',
+  },
+  'WOODCUTTER': {
+    'caption': 'Woodcutter',
+    'parent': 'WOODWORKER',
+    'color': '14',
+    'moodable': 'true',
+  },
+  'STONEWORKER': {
+    'caption': 'Stoneworker',
+    'color': '15',
+    'moodable': 'true',
+  },
+  'ENGRAVER': {
+    'caption': 'Engraver',
+    'parent': 'STONEWORKER',
+    'color': '15',
+    'moodable': 'true',
+  },
+  'MASON': {
+    'caption': 'Mason',
+    'parent': 'STONEWORKER',
+    'color': '15',
+    'moodable': 'true',
+  },
+  'RANGER': {
+    'caption': 'Ranger',
+    'color': '2',
+    'moodable': 'true',
+  },
+  'ANIMAL_CARETAKER': {
+    'caption': 'Animal Caretaker',
+    'parent': 'RANGER',
+    'color': '2',
+    'moodable': 'true',
+  },
+
+  // 10
+
+  'ANIMAL_TRAINER': {
+    'caption': 'Animal Trainer',
+    'parent': 'RANGER',
+    'color': '2',
+    'moodable': 'true',
+  },
+  'HUNTER': {
+    'caption': 'Hunter',
+    'parent': 'RANGER',
+    'color': '2',
+    'moodable': 'true',
+  },
+  'TRAPPER': {
+    'caption': 'Trapper',
+    'parent': 'RANGER',
+    'color': '2',
+    'moodable': 'true',
+  },
+  'ANIMAL_DISSECTOR': {
+    'caption': 'Animal Dissector',
+    'parent': 'RANGER',
+    'color': '2',
+    'moodable': 'true',
+  },
+  'METALSMITH': {
+    'caption': 'Metalsmith',
+    'color': '8',
+    'moodable': 'true',
+  },
+  'FURNACE_OPERATOR': {
+    'caption': 'Furnace Operator',
+    'parent': 'METALSMITH',
+    'color': '8',
+    'moodable': 'true',
+  },
+  'WEAPONSMITH': {
+    'caption': 'Weaponsmith',
+    'parent': 'METALSMITH',
+    'color': '8',
+    'moodable': 'true',
+  },
+  'ARMORER': {
+    'caption': 'Armorer',
+    'parent': 'METALSMITH',
+    'color': '8',
+    'moodable': 'true',
+  },
+  'BLACKSMITH': {
+    'caption': 'Blacksmith',
+    'parent': 'METALSMITH',
+    'color': '8',
+    'moodable': 'true',
+  },
+  'METALCRAFTER': {
+    'caption': 'Metalcrafter',
+    'parent': 'METALSMITH',
+    'color': '8',
+    'moodable': 'true',
+  },
+
+  // 20
+
+  'JEWELER': {
+    'caption': 'Jeweler',
+    'color': '10',
+    'moodable': 'true',
+  },
+  'GEM_CUTTER': {
+    'caption': 'Gem Cutter',
+    'parent': 'JEWELER',
+    'color': '10',
+    'moodable': 'true',
+  },
+  'GEM_SETTER': {
+    'caption': 'Gem Setter',
+    'parent': 'JEWELER',
+    'color': '10',
+    'moodable': 'true',
+  },
+  'CRAFTSMAN': {
+    'caption': 'Craftsman',
+    'color': '9',
+    'moodable': 'true',
+  },
+  'WOODCRAFTER': {
+    'caption': 'Woodcrafter',
+    'parent': 'CRAFTSMAN',
+    'color': '9',
+    'moodable': 'true',
+  },
+  'STONECRAFTER': {
+    'caption': 'Stonecrafter',
+    'parent': 'CRAFTSMAN',
+    'color': '9',
+    'moodable': 'true',
+  },
+  'LEATHERWORKER': {
+    'caption': 'Leatherworker',
+    'parent': 'CRAFTSMAN',
+    'color': '9',
+    'moodable': 'true',
+  },
+  'BONE_CARVER': {
+    'caption': 'Bone Carver',
+    'parent': 'CRAFTSMAN',
+    'color': '9',
+    'moodable': 'true',
+  },
+  'WEAVER': {
+    'caption': 'Weaver',
+    'parent': 'CRAFTSMAN',
+    'color': '9',
+    'moodable': 'true',
+  },
+  'CLOTHIER': {
+    'caption': 'Clothier',
+    'parent': 'CRAFTSMAN',
+    'color': '9',
+    'moodable': 'true',
+  },
+
+  // 30
+
+  'GLASSMAKER': {
+    'caption': 'Glassmaker',
+    'parent': 'CRAFTSMAN',
+    'color': '9',
+    'moodable': 'true',
+  },
+  'POTTER': {
+    'caption': 'Potter',
+    'parent': 'CRAFTSMAN',
+    'color': '9',
+    'moodable': 'true',
+  },
+  'GLAZER': {
+    'caption': 'Glazer',
+    'parent': 'CRAFTSMAN',
+    'color': '9',
+    'moodable': 'true',
+  },
+  'WAX_WORKER': {
+    'caption': 'Wax Worker',
+    'parent': 'CRAFTSMAN',
+    'color': '9',
+    'moodable': 'true',
+  },
+  'STRAND_EXTRACTOR': {
+    'caption': 'Strand Extractor',
+    'parent': 'CRAFTSMAN',
+    'color': '9',
+    'moodable': 'true',
+  },
+  'FISHERY_WORKER': {
+    'caption': 'Fishery Worker',
+    'color': '1',
+    'moodable': 'true',
+  },
+  'FISHERMAN': {
+    'caption': 'Fisherman',
+    'parent': 'FISHERY_WORKER',
+    'color': '1',
+    'moodable': 'true',
+  },
+  'FISH_DISSECTOR': {
+    'caption': 'Fish Dissector',
+    'parent': 'FISHERY_WORKER',
+    'color': '1',
+    'moodable': 'true',
+  },
+  'FISH_CLEANER': {
+    'caption': 'Fish Cleaner',
+    'parent': 'FISHERY_WORKER',
+    'color': '1',
+    'moodable': 'true',
+  },
+  'FARMER': {
+    'caption': 'Farmer',
+    'color': '6',
+    'moodable': 'true',
+  },
+
+  // 40
+
+  'CHEESE_MAKER': {
+    'caption': 'Cheese Maker',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'MILKER': {
+    'caption': 'Milker',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'COOK': {
+    'caption': 'Cook',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'THRESHER': {
+    'caption': 'Thresher',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'MILLER': {
+    'caption': 'Miller',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'BUTCHER': {
+    'caption': 'Butcher',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'TANNER': {
+    'caption': 'Tanner',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'DYER': {
+    'caption': 'Dyer',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'PLANTER': {
+    'caption': 'Planter',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'HERBALIST': {
+    'caption': 'Herbalist',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+
+  // 50
+
+  'BREWER': {
+    'caption': 'Brewer',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'SOAP_MAKER': {
+    'caption': 'Soap Maker',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'POTASH_MAKER': {
+    'caption': 'Potash Maker',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'LYE_MAKER': {
+    'caption': 'Lye Maker',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'WOOD_BURNER': {
+    'caption': 'Wood Burner',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'SHEARER': {
+    'caption': 'Shearer',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'SPINNER': {
+    'caption': 'Spinner',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'PRESSER': {
+    'caption': 'Presser',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'BEEKEEPER': {
+    'caption': 'Bee Keeper',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'ENGINEER': {
+    'caption': 'Engineer',
+    'color': '12',
+    'moodable': 'true',
+  },
+
+  // 60
+
+  'MECHANIC': {
+    'caption': 'Mechanic',
+    'parent': 'ENGINEER',
+    'color': '12',
+    'moodable': 'true',
+  },
+  'SIEGE_ENGINEER': {
+    'caption': 'Siege Engineer',
+    'parent': 'ENGINEER',
+    'color': '12',
+    'moodable': 'true',
+  },
+  'SIEGE_OPERATOR': {
+    'caption': 'Siege Operator',
+    'parent': 'ENGINEER',
+    'color': '12',
+    'moodable': 'true',
+  },
+  'PUMP_OPERATOR': {
+    'caption': 'Pump Operator',
+    'parent': 'ENGINEER',
+    'color': '12',
+    'moodable': 'true',
+  },
+  'CLERK': {
+    'caption': 'Clerk',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'ADMINISTRATOR': {
+    'caption': 'Administrator',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'TRADER': {
+    'caption': 'Trader',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'ARCHITECT': {
+    'caption': 'Architect',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'ALCHEMIST': {
+    'caption': 'Alchemist',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'DOCTOR': {
+    'caption': 'Doctor',
+    'color': '5',
+    'moodable': 'true',
+  },
+
+  // 70
+
+  'DIAGNOSER': {
+    'caption': 'Diagnoser',
+    'parent': 'DOCTOR',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'BONE_SETTER': {
+    'caption': 'Bone Setter',
+    'parent': 'DOCTOR',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'SUTURER': {
+    'caption': 'Suturer',
+    'parent': 'DOCTOR',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'SURGEON': {
+    'caption': 'Surgeon',
+    'parent': 'DOCTOR',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'MERCHANT': {
+    'caption': 'Merchant',
+    'color': '7',
+  },
+  'HAMMERMAN': {
+    'caption': 'Hammerman',
+    'military': 'true',
+    'color': '5',
+  },
+  'MASTER_HAMMERMAN': {
+    'caption': 'Hammer Lord',
+    'military': 'true',
+    'parent': 'HAMMERMAN',
+    'color': '13',
+  },
+  'SPEARMAN': {
+    'caption': 'Spearman',
+    'military': 'true',
+    'color': '6',
+  },
+  'MASTER_SPEARMAN': {
+    'caption': 'Spearmaster',
+    'military': 'true',
+    'parent': 'SPEARMAN',
+    'color': '14',
+  },
+  'CROSSBOWMAN': {
+    'caption': 'Crossbowman',
+    'military': 'true',
+    'color': '2',
+  },
+
+  // 80
+
+  'MASTER_CROSSBOWMAN': {
+    'caption': 'Elite Crossbowman',
+    'military': 'true',
+    'parent': 'CROSSBOWMAN',
+    'color': '10',
+  },
+  'WRESTLER': {
+    'caption': 'Wrestler',
+    'military': 'true',
+    'color': '7',
+  },
+  'MASTER_WRESTLER': {
+    'caption': 'Elite Wrestler',
+    'military': 'true',
+    'parent': 'WRESTLER',
+    'color': '15',
+  },
+  'AXEMAN': {
+    'caption': 'Axeman',
+    'military': 'true',
+    'color': '1',
+  },
+  'MASTER_AXEMAN': {
+    'caption': 'Axe Lord',
+    'military': 'true',
+    'parent': 'AXEMAN',
+    'color': '9',
+  },
+  'SWORDSMAN': {
+    'caption': 'Swordsman',
+    'military': 'true',
+    'color': '3',
+  },
+  'MASTER_SWORDSMAN': {
+    'caption': 'Swordsmaster',
+    'military': 'true',
+    'parent': 'SWORDSMAN',
+    'color': '11',
+  },
+  'MACEMAN': {
+    'caption': 'Maceman',
+    'military': 'true',
+    'color': '4',
+  },
+  'MASTER_MACEMAN': {
+    'caption': 'Mace Lord',
+    'military': 'true',
+    'parent': 'MACEMAN',
+    'color': '12',
+  },
+  'PIKEMAN': {
+    'caption': 'Pikeman',
+    'military': 'true',
+    'color': '6',
+  },
+
+  // 90
+
+  'MASTER_PIKEMAN': {
+    'caption': 'Pikemaster',
+    'military': 'true',
+    'parent': 'PIKEMAN',
+    'color': '14',
+  },
+  'BOWMAN': {
+    'caption': 'Bowman',
+    'military': 'true',
+    'color': '2',
+  },
+  'MASTER_BOWMAN': {
+    'caption': 'Elite Bowman',
+    'military': 'true',
+    'parent': 'BOWMAN',
+    'color': '10',
+  },
+  'BLOWGUNMAN': {
+    'caption': 'Blowgunner',
+    'military': 'true',
+    'color': '8',
+  },
+  'MASTER_BLOWGUNMAN': {
+    'caption': 'Master Blowgunner',
+    'military': 'true',
+    'parent': 'BLOWGUNMAN',
+    'color': '8',
+  },
+  'LASHER': {
+    'caption': 'Lasher',
+    'military': 'true',
+    'color': '8',
+  },
+  'MASTER_LASHER': {
+    'caption': 'Master Lasher',
+    'military': 'true',
+    'parent': 'LASHER',
+    'color': '8',
+  },
+  'RECRUIT': {
+    'caption': 'Recruit',
+    'military': 'true',
+    'color': '8',
+    'moodable': 'true',
+  },
+  'TRAINED_HUNTER': {
+    'caption': 'Hunting Animal',
+    'color': '15',
+  },
+  'TRAINED_WAR': {
+    'caption': 'War Animal',
+    'color': '8',
+  },
+
+  // 100
+
+  'MASTER_THIEF': {
+    'caption': 'Master Thief',
+    'parent': 'THIEF',
+    'color': '8',
+  },
+  'THIEF': {
+    'caption': 'Thief',
+    'color': '8',
+  },
+  'STANDARD': {
+    'caption': 'Peasant',
+    'color': '-1',
+    'moodable': 'true',
+  },
+  'CHILD': {
+    'caption': 'Child',
+    'can_assign_labor': 'false',
+    'parent': 'STANDARD',
+    'color': '4',
+    'moodable': 'true',
+  },
+  'BABY': {
+    'caption': 'Baby',
+    'can_assign_labor': 'false',
+    'parent': 'STANDARD',
+    'color': '4',
+  },
+  'DRUNK': {
+    'caption': 'Drunk',
+    'can_assign_labor': 'false',
+    'parent': 'STANDARD',
+    'color': '6',
+  },
+  'MONSTER_SLAYER': {
+    'caption': 'Monster slayer',
+    'can_assign_labor': 'false',
+    'parent': 'STANDARD',
+    'color': '6',
+  },
+  'SCOUT': {
+    'caption': 'Scout',
+    'can_assign_labor': 'false',
+    'parent': 'STANDARD',
+    'color': '6',
+  },
+  'BEAST_HUNTER': {
+    'caption': 'Beast hunter',
+    'can_assign_labor': 'false',
+    'parent': 'STANDARD',
+    'color': '6',
+  },
+  'SNATCHER': {
+    'caption': 'Snatcher',
+    'can_assign_labor': 'false',
+    'parent': 'STANDARD',
+    'color': '6',
+  },
+
+  // 110
+
+  'MERCENARY': {
+    'caption': 'Mercenary',
+    'can_assign_labor': 'false',
+    'parent': 'STANDARD',
+    'color': '6',
+  },
+  'GELDER': {
+    'caption': 'Gelder',
+    'parent': 'FARMER',
+    'color': '6',
+    'moodable': 'true',
+  },
+  'PERFORMER': {
+    'caption': 'Performer',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'POET': {
+    'caption': 'Poet',
+    'parent': 'PERFORMER',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'BARD': {
+    'caption': 'Bard',
+    'parent': 'PERFORMER',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'DANCER': {
+    'caption': 'Dancer',
+    'parent': 'PERFORMER',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'SAGE': {
+    'caption': 'Sage',
+    'parent': 'SCHOLAR',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'SCHOLAR': {
+    'caption': 'Scholar',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'PHILOSOPHER': {
+    'caption': 'Philosopher',
+    'parent': 'SCHOLAR',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'MATHEMATICIAN': {
+    'caption': 'Mathematician',
+    'parent': 'SCHOLAR',
+    'color': '5',
+    'moodable': 'true',
+  },
+
+  // 120
+
+  'HISTORIAN': {
+    'caption': 'Historian',
+    'parent': 'SCHOLAR',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'ASTRONOMER': {
+    'caption': 'Astronomer',
+    'parent': 'SCHOLAR',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'NATURALIST': {
+    'caption': 'Naturalist',
+    'parent': 'SCHOLAR',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'CHEMIST': {
+    'caption': 'Chemist',
+    'parent': 'SCHOLAR',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'GEOGRAPHER': {
+    'caption': 'Geographer',
+    'parent': 'SCHOLAR',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'SCRIBE': {
+    'caption': 'Scribe',
+    'color': '5',
+    'moodable': 'true',
+  },
+  'PAPERMAKER': {
+    'caption': 'Papermaker',
+    'parent': 'CRAFTSMAN',
+    'color': '9',
+    'moodable': 'true',
+  },
+  'BOOKBINDER': {
+    'caption': 'Bookbinder',
+    'parent': 'CRAFTSMAN',
+    'color': '9',
+    'moodable': 'true',
+  },
+  'TAVERN_KEEPER': {
+    'caption': 'Tavern Keeper',
+    'color': '5',
+  },
+
+  'CRIMINAL': {
+    'caption': 'Criminal',
+    'color': '8',
+  },
+
+  // 130
+
+  'PEDDLER': {
+    'caption': 'Peddler',
+    'color': '7',
+  },
+  'PROPHET': {
+    'caption': 'Prophet',
+    'color': '15',
+  },
+  'PILGRIM': {
+    'caption': 'Pilgrim',
+    'color': '15',
+  },
+  'MONK': {
+    'caption': 'Monk',
+    'color': '15',
+  },
+  'MESSENGER': {
+    'caption': 'Messenger',
+    'color': '5',
+  },
+}
+export const professionById = Object.keys(profession).map(k => profession[k])

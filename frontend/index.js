@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import ReactDOM from 'react-dom'
 import './style.css'
-import { jobSkillById, jobTypeById, laborName, skillLevel } from './enums'
+import { jobSkillById, jobTypeById, laborName, professionById, skillLevel } from './enums'
 import { applyPatch } from 'rfc6902'
 
 const WorldDataContext = React.createContext(null)
@@ -118,7 +118,7 @@ const modeName = {
 
 const Unit = ({unit}) => {
   const worldData = useContext(WorldDataContext)
-  const profession = unit.customProfession || jobSkillById[unit.profession].caption_noun
+  const profession = unit.customProfession || professionById[unit.profession].caption
   return <div className="unit">
     <div className="name">
       {unit.name ? <>
