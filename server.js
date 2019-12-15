@@ -92,8 +92,6 @@ app.get('/auth/twitch/callback', passport.authenticate("twitch", { failureRedire
 
 let units = []
 let enums = null
-let creatureRaws = null
-let itemTypes = null
 let worldInfo = null
 
 app.get('/static-data', (req, res) => {
@@ -226,8 +224,6 @@ app.get('/_watching', (req, res, next) => {
 
 df.connect().then(async () => {
   console.log('fetching static data...')
-  creatureRaws = (await df.GetCreatureRaws()).creatureRaws
-  itemTypes = (await df.GetItemList()).materialList
   worldInfo = await df.GetWorldInfo()
   enums = await df.ListEnums()
 
