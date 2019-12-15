@@ -119,7 +119,7 @@ function isResident(u) {
 }
 
 function canBeClaimed(u) {
-  return !isInactive(u) && !isVisitor(u) && isResident(u)
+  return !isInactive(u) && !isVisitor(u)
 }
 
 async function claimUnit(userId, unitId, nickname) {
