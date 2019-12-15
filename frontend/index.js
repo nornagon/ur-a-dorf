@@ -126,17 +126,18 @@ const Unit = ({unit}) => {
       </> : null}, {profession}
     </div>
     <div className="job">
-      <Job job={unit.creature.currentJob} />
+      {unit.creature ? <Job job={unit.creature.currentJob} /> : null}
     </div>
-    <div className="environment">
-      {unit.creature.outside ? <span style={df_color_to_css['3:0:1']}>Outside</span> : <span style={df_color_to_css['6:0:0']}>Inside</span>}
-      {" "}
-      {unit.creature.light ? <span style={df_color_to_css['6:0:1']}>Light</span> : <span style={df_color_to_css['7:0:0']}>Dark</span>}
-      {" "}
-      {unit.creature.light ? <span style={df_color_to_css['2:0:1']}>Above Ground</span> : <span style={df_color_to_css['7:0:0']}>Subterranean</span>}
-    </div>
+    {unit.creature ?
+      <div className="environment">
+        {unit.creature.outside ? <span style={df_color_to_css['3:0:1']}>Outside</span> : <span style={df_color_to_css['6:0:0']}>Inside</span>}
+        {" "}
+        {unit.creature.light ? <span style={df_color_to_css['6:0:1']}>Light</span> : <span style={df_color_to_css['7:0:0']}>Dark</span>}
+        {" "}
+        {unit.creature.light ? <span style={df_color_to_css['2:0:1']}>Above Ground</span> : <span style={df_color_to_css['7:0:0']}>Subterranean</span>}
+      </div> : null}
     <div className="description">
-      {<DFText text={unit.creature.appearance.description} /> || <em>(no description)</em>}
+      {unit.creature ? <DFText text={unit.creature.appearance.description} /> : null}
     </div>
     <details>
       <summary>Skills</summary>
@@ -150,7 +151,7 @@ const Unit = ({unit}) => {
       <summary>Labors</summary>
       <div className="labors">
         {worldData.enums.unitLabor.filter(l => l.value >= 0)
-            .map(l => <div key={l.value}><input type="checkbox" checked={unit.labors.includes(l.value)} onChange={(e) => {
+            .map(l => <div key={l.value}><input type="checkbox" checked={(unit.labors || []).includes(l.value)} onChange={(e) => {
               fetch('/set-labor', {
                 method: 'POST',
                 headers: {'Content-type': 'application/json'},
@@ -166,7 +167,7 @@ const Unit = ({unit}) => {
     <details>
       <summary>Inventory</summary>
       <ul>
-        {(unit.creature.inventory || []).map(({item, mode}) => {
+        {(unit.creature && unit.creature.inventory ? unit.creature.inventory : []).map(({item, mode}) => {
           return <li key={item.id}><Item item={item} />, {modeName[mode]}</li>
         })}
       </ul>
