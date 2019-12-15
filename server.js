@@ -232,6 +232,10 @@ df.connect().then(async () => {
 
   async function update() {
     const claims = await store.getAllClaims()
+    const watchingUserIds = Object.values(watching).map(u => u.user.id)
+    const watchedClaims = claims.filter(c => watchingUserIds.includes(c.userId))
+    const watchedUnits = watchedClaims.map(c => c.unitId)
+
     const { civId } = worldInfo
     const { value: _units } = await df.ListUnits({
       scanAll: true,
@@ -239,8 +243,8 @@ df.connect().then(async () => {
       race: worldInfo.raceId, // TODO: not all members of the fortress are necessarily dwarves...
       mask: { labors: true, skills: true, profession: true, miscTraits: true }
     })
-    const unitIds = claims.map(c => c.unitId)
-    const { creatureList } = await df.GetUnits({unitIds})
+
+    const { creatureList } = await df.GetUnits({ unitIds: watchedUnits })
     for (const creature of (creatureList || [])) {
       const unit = _units.find(u => u.unitId === creature.id)
       if (unit) {
