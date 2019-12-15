@@ -28,6 +28,7 @@ const methods = {
   ResetMapHashes: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: dfproto.EmptyMessage},
   GetCreatureRaws: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: RemoteFortressReader.CreatureRawList},
   GetUnitList: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: RemoteFortressReader.UnitList},
+  GetUnits: {plugin: 'RemoteFortressReader', in: RemoteFortressReader.UnitRequest, out: RemoteFortressReader.UnitList},
   GetItemList: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: RemoteFortressReader.MaterialList},
   GetMaterialList: {plugin: 'RemoteFortressReader', in: dfproto.EmptyMessage, out: RemoteFortressReader.MaterialList},
 

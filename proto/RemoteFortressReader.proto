@@ -13,6 +13,7 @@ import "ItemdefInstrument.proto";
 // RPC CheckHashes : EmptyMessage -> EmptyMessage
 // RPC GetTiletypeList : EmptyMessage -> TiletypeList
 // RPC GetPlantList : BlockRequest -> PlantList
+// RPC GetUnits : UnitRequest -> UnitList
 // RPC GetUnitList : EmptyMessage -> UnitList
 // RPC GetUnitListInside : BlockRequest -> UnitList
 // RPC GetViewInfo : EmptyMessage -> ViewInfo
@@ -42,6 +43,11 @@ import "ItemdefInstrument.proto";
 // RPC MovementSelectCommand : IntMessage -> EmptyMessage
 // RPC MiscMoveCommand : MiscMoveParams -> EmptyMessage
 // RPC GetLanguage : EmptyMessage -> Language
+
+message UnitRequest
+{
+    repeated int32 unit_ids = 1;
+}
 
 //We use shapes, etc, because the actual tiletypes may differ between DF versions.
 enum TiletypeShape
@@ -433,7 +439,7 @@ message InventoryItem
     optional Item item = 2;
 }
 
-message Job
+message JobInfo
 {
     optional int32 id = 1;
     optional int32 type = 2;
@@ -471,7 +477,7 @@ message UnitDefinition
     optional float subpos_x = 21;
     optional float subpos_y = 22;
     optional float subpos_z = 23;
-    optional Job current_job = 24;
+    optional JobInfo current_job = 24;
 
     optional bool light = 25;
     optional bool subterranean = 26;

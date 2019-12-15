@@ -217,6 +217,7 @@ df.connect().then(async () => {
   console.log(`listening on http://localhost:5050`)
 
   setInterval(async () => {
+    const claims = await store.getAllClaims()
     const { civId } = worldInfo
     const { value: _units } = await df.ListUnits({
       scanAll: true,
@@ -224,11 +225,13 @@ df.connect().then(async () => {
       race: worldInfo.raceId, // TODO: not all members of the fortress are necessarily dwarves...
       mask: { labors: true, skills: true, profession: true, miscTraits: true }
     })
-    const { creatureList } = await df.GetUnitList()
-    for (const creature of creatureList) {
+    const unitIds = claims.map(c => c.unitId)
+    const { creatureList } = await df.GetUnits({unitIds})
+    for (const creature of (creatureList || [])) {
       const unit = _units.find(u => u.unitId === creature.id)
-      if (unit)
+      if (unit) {
         unit.creature = creature
+      }
     }
     units = _units
   }, 500)
