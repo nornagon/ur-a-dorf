@@ -234,7 +234,7 @@ df.connect().then(async () => {
   app.listen(5050)
   console.log(`listening on http://localhost:5050`)
 
-  setInterval(async () => {
+  async function update() {
     const claims = await store.getAllClaims()
     const { civId } = worldInfo
     const { value: _units } = await df.ListUnits({
@@ -252,7 +252,9 @@ df.connect().then(async () => {
       }
     }
     units = _units
-  }, 500)
+  }
+  setInterval(update, 5000)
+  update()
 }).catch(e => {
   console.error(e)
   df.close()
