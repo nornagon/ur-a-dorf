@@ -108,6 +108,22 @@ app.post('/set-labor', (req, res) => {
     )
 })
 
+function isInactive(u) {
+  return (u.flags1 & (1 << 1)) !== 0
+}
+
+function isVisitor(u) {
+  return (u.flags2 & (1 << 23)) !== 0
+}
+
+function isResident(u) {
+  return (u.flags2 & (1 << 19)) !== 0
+}
+
+function canBeClaimed(u) {
+  return !isInactive(u) && !isVisitor(u) && isResident(u)
+}
+
 async function claimUnit(userId, unitId, nickname) {
   await store.createClaim(userId, unitId)
   await df.RenameUnit({ unitId, nickname })
@@ -116,7 +132,7 @@ async function getAvailableUnits() {
   const claims = await store.getAllClaims()
   const claimedUnits = new Set
   for (const c of claims) { claimedUnits.add(c.unitId) }
-  return units.filter(u => !claimedUnits.has(u.unitId))
+  return units.filter(u => !claimedUnits.has(u.unitId) && canBeClaimed(u))
 }
 async function getClaimedUnit(userId) {
   const existingClaims = await store.getClaims(userId)
@@ -141,6 +157,8 @@ app.post('/claim-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
       const claimed = available.find(u => u.name.nickname === req.user.display_name) || available[0]
       await claimUnit(req.user.id, claimed.unitId, req.user.display_name)
       res.json({ok: true, claimed: claimed.unitId})
+    } else {
+      res.json({ok: false, reason: "no units"})
     }
   })().catch(next)
 })
