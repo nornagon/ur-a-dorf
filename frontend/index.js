@@ -92,21 +92,17 @@ const Item = ({item}) => {
     name = wrap(name, '«', '»')
     name = wrap(name, qualityMarker[improvementQuality])
   }
-  return <span>{name}{item.stackSize > 1 ? ` [${item.stackSize}]` : null}</span>
-}
-
-const Job = ({job}) => {
-  if (!job) {
-    return <span>No Job</span>
-  }
+  return <span>{name}</span>
 }
 
 const Activity = ({unit}) => {
   if (!unit.creature) return null
   const { activities, socialActivities, currentJob } = unit.creature
   if (currentJob) {
-    const jobType = jobTypeById[currentJob.type]
-    return <span>{jobType.caption}</span>
+    const detail = currentJob.items ?
+      <> (<ul className="comma-sep">{currentJob.items.flatMap((item, idx) => <li key={item.id}><Item item={item} /></li>)}</ul>) </>
+      : null
+    return <span>{currentJob.description}{detail}</span>
   }
   if (socialActivities && socialActivities.length) {
     const activity = socialActivities[socialActivities.length - 1]

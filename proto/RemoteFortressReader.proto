@@ -450,6 +450,7 @@ message JobInfo
     optional int32 material_category = 8;
     optional string reaction_name = 9;
     repeated Item items = 10;
+    optional string description = 11;
 }
 
 message UnitActivity

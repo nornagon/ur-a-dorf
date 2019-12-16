@@ -22,3 +22,16 @@ body {
 a:link, a:visited {
   color: cyan;
 }
+
+ul.comma-sep {
+  display: inline;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+ul.comma-sep > li {
+  display: inline;
+}
+ul.comma-sep > li:not(:last-child):after {
+  content: ", ";
+}
