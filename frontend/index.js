@@ -47,6 +47,7 @@ const df_color_to_css = {
 }
 
 const DFText = ({text}) => {
+  if (!text) return null
   const re = /\[(P|B|C:(\d:\d:\d))\]/g
   let out = []
   let idx = 0
@@ -98,8 +99,26 @@ const Job = ({job}) => {
   if (!job) {
     return <span>No Job</span>
   }
-  const jobType = jobTypeById[job.type]
-  return <span>{jobType.caption}</span>
+}
+
+const Activity = ({unit}) => {
+  if (!unit.creature) return null
+  const { activities, socialActivities, currentJob } = unit.creature
+  if (currentJob) {
+    const jobType = jobTypeById[currentJob.type]
+    return <span>{jobType.caption}</span>
+  }
+  if (socialActivities && socialActivities.length) {
+    const activity = socialActivities[socialActivities.length - 1]
+    const event = activity.events[activity.events.length - 1]
+    return <span>{event.name}</span>
+  }
+  if (activities && activities.length) {
+    const activity = socialActivities[socialActivities.length - 1]
+    const event = activity.events[activity.events.length - 1]
+    return <span>{event.name}</span>
+  }
+  return <span>No Job</span>
 }
 
 const modeName = {
@@ -126,7 +145,7 @@ const Unit = ({unit}) => {
       </> : null}, {profession}
     </div>
     <div className="job">
-      {unit.creature ? <Job job={unit.creature.currentJob} /> : null}
+      <Activity unit={unit} />
     </div>
     {unit.creature ?
       <div className="environment">
@@ -137,7 +156,7 @@ const Unit = ({unit}) => {
         {unit.creature.light ? <span style={df_color_to_css['2:0:1']}>Above Ground</span> : <span style={df_color_to_css['7:0:0']}>Subterranean</span>}
       </div> : null}
     <div className="description">
-      {unit.creature ? <DFText text={unit.creature.appearance.description} /> : null}
+      {unit.creature ? <DFText text={unit.creature.appearance.physicalDescription} /> : null}
     </div>
     <details>
       <summary>Skills</summary>
