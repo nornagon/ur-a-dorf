@@ -253,7 +253,7 @@ df.connect().then(async () => {
     }
     units = _units
   }
-  setInterval(update, 5000)
+  setInterval(update, 1000)
   update()
 }).catch(e => {
   console.error(e)
