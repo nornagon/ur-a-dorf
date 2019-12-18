@@ -122,27 +122,32 @@ class DFConnection {
     }
   }
 
-  async _readMessage() {
-    return await this._queue.push(async () => {
-      const reader = this._reader
-      while (true) {
-        const header = await reader.read(8)
-        debug('read header:', header)
-        const id = header.readInt16LE(0)
-        // NB. dfhack message header struct isn't packed.
-        const size = header.readInt32LE(4)
-        debug(`           : id=${id} size=${size}`)
-        if (id === -2 /* RPC_REPLY_FAIL */) {
-          throw new Error(`failed: ${size}`)
+  _readMessage() {
+    return new Promise((resolve, reject) => {
+      this._queue.push(async () => {
+        const reader = this._reader
+        while (true) {
+          const header = await reader.read(8)
+          debug('read header:', header)
+          const id = header.readInt16LE(0)
+          // NB. dfhack message header struct isn't packed.
+          const size = header.readInt32LE(4)
+          debug(`           : id=${id} size=${size}`)
+          if (id === -2 /* RPC_REPLY_FAIL */) {
+            throw new Error(`failed: ${size}`)
+          }
+          const body = size > 0 ? await reader.read(size) : Buffer.alloc(0)
+          debug('read body:', body)
+          if (id === -1 /* RPC_REPLY_RESULT */) {
+            return body
+          } else if (id === -3 /* RPC_REPLY_TEXT */) {
+            debug('reply text:', body.toString())
+          }
         }
-        const body = size > 0 ? await reader.read(size) : Buffer.alloc(0)
-        debug('read body:', body)
-        if (id === -1 /* RPC_REPLY_RESULT */) {
-          return body
-        } else if (id === -3 /* RPC_REPLY_TEXT */) {
-          debug('reply text:', body.toString())
-        }
-      }
+      }, (e, v) => {
+        if (e != null) reject(e)
+        else resolve(v)
+      })
     })
   }
   async _invokeById(id, body) {
