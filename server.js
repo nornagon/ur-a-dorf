@@ -90,7 +90,7 @@ app.get('/auth/twitch/callback', passport.authenticate("twitch", { failureRedire
 })
 
 
-let units = []
+let units = {}
 let enums = null
 let worldInfo = null
 
@@ -101,7 +101,10 @@ app.get('/static-data', (req, res) => {
 app.post('/set-labor', (req, res) => {
   df.SetUnitLabors({change: [req.body]})
     .then(
-      () => res.json({ok: true}),
+      () => {
+        res.json({ok: true})
+        triggerUpdate([req.body.unitId])
+      },
       (e) => { res.json({ok: false}); console.error(e) }
     )
 })
@@ -110,35 +113,98 @@ function isInactive(u) {
   return (u.flags1 & (1 << 1)) !== 0
 }
 
-function isVisitor(u) {
-  return (u.flags2 & (1 << 23)) !== 0
+function isMarauder(u) {
+  return (u.flags1 & (1 << 4)) !== 0
+}
+
+function isMerchant(u) {
+  return (u.flags1 & (1 << 6)) !== 0
+}
+
+function isForest(u) {
+  return (u.flags1 & (1 << 7)) !== 0
+}
+
+function isDiplomat(u) {
+  return (u.flags1 & (1 << 11)) !== 0
+}
+
+function isInvader(u) {
+  return (u.flags1 & (1 << 17)) !== 0 || (u.flags1 & (1 << 19)) !== 0
+}
+
+function isUnderworld(u) {
+  return (u.flags2 & (1 << 18)) !== 0
 }
 
 function isResident(u) {
   return (u.flags2 & (1 << 19)) !== 0
 }
 
+function isUninvitedVisitor(u) {
+  return (u.flags2 & (1 << 22)) !== 0
+}
+
+function isVisitor(u) {
+  return (u.flags2 & (1 << 23)) !== 0
+}
+
+function isGhostly(u) {
+  return (u.flags3 & (1 << 12)) !== 0
+}
+
+const nonLaboringProfessions = new Set([
+  103, // CHILD
+  104, // BABY
+  105, // DRUNK
+  106, // MONSTER_SLAYER
+  107, // SCOUT
+  108, // BEAST_HUNTER
+  109, // SNATCHER
+  110, // MERCENARY
+])
+function canAssignLabor(u) {
+  return !nonLaboringProfessions.has(u.profession)
+}
+
+function isDwarf(u) {
+  // TODO: allow claiming non-dwarf laborable units
+  return u.race === 572
+}
+
 function canBeClaimed(u) {
-  return !isInactive(u) && !isVisitor(u)
+  return !isInactive(u) && !isVisitor(u) && !isGhostly(u) && canAssignLabor(u)
+    && !isMarauder(u) && !isInvader(u) && !isForest(u) && !isMerchant(u) &&
+    !isDiplomat(u) && !isUninvitedVisitor(u) && !isUnderworld(u) &&
+    !isResident(u) && isDwarf(u)
+  // TODO: isOwnGroup
+}
+
+async function getClaimableUnits() {
+  const { civId } = worldInfo
+  const { value: allUnits } = await df.ListUnits({ scanAll: true, civId })
+  return allUnits.filter(canBeClaimed)
+}
+
+async function getAvailableUnits() {
+  const [claims, allUnits] = await Promise.all([
+    store.getAllClaims(),
+    getClaimableUnits()
+  ])
+  const claimedUnits = new Set(claims.map(c => c.unitId))
+  return allUnits.filter(u => !claimedUnits.has(u.unitId))
 }
 
 async function claimUnit(userId, unitId, nickname) {
   await store.createClaim(userId, unitId)
   await df.RenameUnit({ unitId, nickname })
 }
-async function getAvailableUnits() {
-  const claims = await store.getAllClaims()
-  const claimedUnits = new Set
-  for (const c of claims) { claimedUnits.add(c.unitId) }
-  return units.filter(u => !claimedUnits.has(u.unitId) && canBeClaimed(u))
-}
+
 async function getClaimedUnit(userId) {
   const existingClaims = await store.getClaims(userId)
   for (const claim of existingClaims) {
-    for (const unit of units) {
-      if (unit.unitId === claim.unitId) {
-        return unit
-      }
+    if (claim.unitId in units) {
+      return units[claim.unitId]
     }
   }
   return null
@@ -151,9 +217,18 @@ app.post('/claim-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
       return res.json({ok: false, reason: 'You may only claim 1 unit at a time.'})
     }
     const available = await getAvailableUnits()
+    const sortValue = u => {
+      if (u.name.nickname === req.user.display_name) return -100
+      if (u.name.nickname) return 10 // deprioritize nicknamed units
+      return 0
+    }
+    available.sort((a, b) => {
+      return sortValue(a) - sortValue(b)
+    })
     if (available.length > 0) {
-      const claimed = available.find(u => u.name.nickname === req.user.display_name) || available[0]
+      const claimed = available[0]
       await claimUnit(req.user.id, claimed.unitId, req.user.display_name)
+      await triggerUpdate([claimed.unitId])
       res.json({ok: true, claimed: claimed.unitId})
     } else {
       res.json({ok: false, reason: "no units"})
@@ -163,6 +238,7 @@ app.post('/claim-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
 
 const watching = {}
 const watchingEv = new (require('events').EventEmitter)()
+const unitChanges = new (require('events').EventEmitter)()
 
 app.get('/my-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
   if (!(req.user.id in watching)) {
@@ -172,10 +248,10 @@ app.get('/my-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
   watchingEv.emit('changed')
   res.writeHead(200, {'Content-Type': 'text/event-stream', 'Connection': 'keep-alive', 'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'})
   res.write('\n\n')
-  let timeout = null
+  let watchingUnit = null
   req.on('close', () => {
-    if (timeout != null)
-      clearTimeout(timeout)
+    if (watchingUnit != null)
+      unitChanges.off(watchingUnit, check)
     if (req.user.id in watching) {
       watching[req.user.id].count--;
       if (watching[req.user.id].count === 0)
@@ -197,13 +273,16 @@ app.get('/my-unit', ensureLoggedIn('/auth/twitch'), (req, res, next) => {
         }
         lastData = claimedUnit
         res.write(`data: ${JSON.stringify(data)}\n\n`)
+        unitChanges.once(claimedUnit.unitId, check)
+        watchingUnit = claimedUnit.unitId
+      } else {
+        res.end() // eh, come back later.
       }
     } catch (e) {
       console.error(e.stack)
       res.end()
       return
     }
-    timeout = setTimeout(check, 1000)
   }
   check()
 })
@@ -221,6 +300,32 @@ app.get('/_watching', (req, res, next) => {
   handler()
 })
 
+async function updateAllWatchedUnits() {
+  const claims = await store.getAllClaims()
+  const watchingUserIds = Object.values(watching).map(u => u.user.id)
+  const watchedClaims = claims.filter(c => watchingUserIds.includes(c.userId))
+  const watchedUnitIds = watchedClaims.map(c => c.unitId)
+  await triggerUpdate(watchedUnitIds)
+}
+
+async function triggerUpdate(unitIds) {
+  if (!unitIds.length) return
+  const { value: _units } = await df.ListUnits({
+    idList: unitIds,
+    mask: { labors: true, skills: true, profession: true, miscTraits: true }
+  })
+  const { creatureList } = await df.GetUnits({ unitIds })
+  for (const creature of (creatureList || [])) {
+    const unit = _units.find(u => u.unitId === creature.id)
+    if (unit) {
+      unit.creature = creature
+    }
+  }
+  _units.forEach(u => {
+    units[u.unitId] = u
+    unitChanges.emit(u.unitId)
+  })
+}
 
 df.connect().then(async () => {
   console.log('fetching static data...')
@@ -230,31 +335,8 @@ df.connect().then(async () => {
   app.listen(5050)
   console.log(`listening on http://localhost:5050`)
 
-  async function update() {
-    const claims = await store.getAllClaims()
-    const watchingUserIds = Object.values(watching).map(u => u.user.id)
-    const watchedClaims = claims.filter(c => watchingUserIds.includes(c.userId))
-    const watchedUnits = watchedClaims.map(c => c.unitId)
-
-    const { civId } = worldInfo
-    const { value: _units } = await df.ListUnits({
-      scanAll: true,
-      civId,
-      race: worldInfo.raceId, // TODO: not all members of the fortress are necessarily dwarves...
-      mask: { labors: true, skills: true, profession: true, miscTraits: true }
-    })
-
-    const { creatureList } = await df.GetUnits({ unitIds: watchedUnits })
-    for (const creature of (creatureList || [])) {
-      const unit = _units.find(u => u.unitId === creature.id)
-      if (unit) {
-        unit.creature = creature
-      }
-    }
-    units = _units
-  }
-  setInterval(update, 1000)
-  update()
+  setInterval(updateAllWatchedUnits, 1000)
+  updateAllWatchedUnits()
 }).catch(e => {
   console.error(e)
   df.close()
