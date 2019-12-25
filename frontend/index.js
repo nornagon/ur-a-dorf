@@ -81,6 +81,7 @@ const wrap = (str, left, right) => {
 }
 
 const qualityMarker = [ '', '-', '+', '*', '≡', '☼' ]
+const wearMarker = [ '', 'x', 'X', 'XX' ]
 
 const Item = ({item}) => {
   const foreign = !!(item.flags1 & (1 << 14))
@@ -91,6 +92,9 @@ const Item = ({item}) => {
   if (isImproved) {
     name = wrap(name, '«', '»')
     name = wrap(name, qualityMarker[improvementQuality])
+  }
+  if (item.wear && item.wear > 0) {
+    name = wrap(name, wearMarker[item.wear])
   }
   return <span>{name}</span>
 }

@@ -328,6 +328,7 @@ message Item
     optional int32 quality = 20;
     optional int32 improvement_quality = 21;
     optional bool is_improved = 22;
+    optional int32 wear = 23;
 }
 
 message MapBlock
