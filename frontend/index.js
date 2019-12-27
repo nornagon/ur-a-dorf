@@ -85,8 +85,8 @@ const wearMarker = [ '', 'x', 'X', 'XX' ]
 
 const Item = ({item}) => {
   const foreign = !!(item.flags1 & (1 << 14))
-  const {quality, isImproved, improvementQuality, description} = item
-  let name = description
+  const {quality, isImproved, improvementQuality, description, artifactName} = item
+  let name = artifactName || description
   if (foreign) name = wrap(description, '(', ')')
   name = wrap(name, qualityMarker[quality])
   if (isImproved) {
