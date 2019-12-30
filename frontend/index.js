@@ -85,7 +85,7 @@ const wearMarker = [ '', 'x', 'X', 'XX' ]
 
 const Item = ({item}) => {
   const foreign = !!(item.flags1 & (1 << 14))
-  const {quality, isImproved, improvementQuality, description, artifactName} = item
+  const {quality, isImproved, improvementQuality, description, artifactName, contaminants} = item
   let name = artifactName || description
   if (foreign) name = wrap(description, '(', ')')
   name = wrap(name, qualityMarker[quality])
@@ -96,7 +96,7 @@ const Item = ({item}) => {
   if (item.wear && item.wear > 0) {
     name = wrap(name, wearMarker[item.wear])
   }
-  return <span>{name}</span>
+  return <span>{name}{!contaminants ? null : <span style={df_color_to_css['2:0:0']}> (<ul className="comma-sep">{contaminants.map((c, i) => <li key={i}>{c.description}</li>)}</ul>)</span> }</span>
 }
 
 const Activity = ({unit}) => {

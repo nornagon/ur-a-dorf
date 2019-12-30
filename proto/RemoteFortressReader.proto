@@ -297,6 +297,7 @@ message Spatter
     optional int32 amount = 2;
     optional MatterState state = 3;
     optional MatPair item = 4;
+    optional string description = 5;
 }
 
 message SpatterPile
@@ -330,6 +331,7 @@ message Item
     optional bool is_improved = 22;
     optional int32 wear = 23;
     optional string artifact_name = 24;
+    repeated Spatter contaminants = 25;
 }
 
 message MapBlock
