@@ -16,7 +16,7 @@
     "node-localstorage": "^2.1.5",
     "passport": "^0.4.0",
     "passport-twitch-new": "^0.0.1",
-    "protobufjs": "^6.8.8",
+    "protobufjs": "^6.11.3",
     "rfc6902": "^3.0.4",
     "webpack-dev-middleware": "^3.7.2"
   },
